@@ -1,7 +1,7 @@
 var arDrone = require('ar-drone');
 var client = arDrone.createClient();
 
-client.config('control:altitude_max', 3500);
+client.config('control:altitude_max', 4000);
 
 client.on('navdata', console.log);
 
@@ -17,7 +17,13 @@ client
 .after(1000, function() {
 	this.up(1);
 })
+.after(5000, function() {
+	this.animate('flipLeft', 100);
+})
 .after(1000, function() {
+	this.up(1);
+})
+.after(5000, function() {
 	this.stop();
 	this.land();
 })
