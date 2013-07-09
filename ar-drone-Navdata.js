@@ -1,13 +1,13 @@
-var navdata = require('ar-drone/lib/navdata/parseNavdata');
-var udpNavdata = require('ar-drone/lib/navdata/UdpNavdataStream');
 var arDrone = require('ar-drone');
+var navdata = require('./navdataParse');//require('ar-drone/lib/navdata/parseNavdata');
 var client = arDrone.createClient();
 
-client.on('navdata', navdata);
+client.on('navdata', navdata.data);
+
 client
 .after(1000, function() {
-	console.log(navdata.altitude);
-})
+	console.log(data);
+})/*
 .after(1000, function() {
 	console.log(navdata.altitude);
 })
@@ -19,8 +19,7 @@ client
 })
 .after(1000, function() {
 	console.log(navdata.altitude);
-})
+})*/
 .after(1000, function() {
-	console.log(navdata.altitude);
-	process.exit(1);
+	//process.exit(1);
 });

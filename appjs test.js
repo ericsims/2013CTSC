@@ -1,57 +1,45 @@
-var app = module.exports = require('appjs');
- 
-app.serveFilesFrom(__dirname + '/content');
- 
-var window = app.createWindow({
-  width  : 1024,
-  height : 768,
-  icons  : __dirname + '/content/icons',
-  showChrome : false,
-  alpha: true,
-  autoResize: false,
-  resizable: true,
-  margin: 0
- 
-  /***************************** defaults ********************************
-* url            : 'http://appjs', // serve static file root and routers
-* autoResize     : false,          // resizes in response to html content
-* showChrome     : true,           // show border and title bar
-* resizable      : false,          // control if users can resize window
-* disableSecurity: true,           // allow cross origin requests
-* opacity        : 1,              // flat percent opacity for window
-* alpha          : false,          // per-pixel alpha blended (Win & Mac)
-* fullscreen     : false,          // client area covers whole screen
-* left           : -1,             // centered by default
-* top            : -1,             // centered by default
-*************************************************************************/
- 
+// load appjs
+
+var appjs = require('appjs');
+
+// serve static files from a directory
+appjs.serveFilesFrom(__dirname + '/content');
+
+// handle requests from the browser
+appjs.router.post('/', function(request, response, next){
+  response.send('Hey! How are you ' + request.post('firstname'));
+})
+
+// create a window
+var window = appjs.createWindow({
+  width: 640,
+  height: 460,
+  alpha: false,
 });
- 
+
+// prepare the window when first created
 window.on('create', function(){
   console.log("Window Created");
-  window.frame.show();
-  window.frame.center();
+  // window.frame controls the desktop window
+  window.frame.show().center();
 });
- 
+
+// the window is ready when the DOM is loaded
 window.on('ready', function(){
   console.log("Window Ready");
-  window.require = require;
+  // directly interact with the DOM
   window.process = process;
   window.module = module;
- 
-  function F12(e){ return e.keyIdentifier === 'F12' }
-  function Command_Option_J(e){ return e.keyCode === 74 && e.metaKey && e.altKey }
- 
+
   window.addEventListener('keydown', function(e){
-    if (F12(e) || Command_Option_J(e)) {
+    // show chrome devtools on f12 or commmand+option+j
+    if (e.keyIdentifier === 'F12' || e.keyCode === 74 && e.metaKey && e.altKey) {
       window.frame.openDevTools();
     }
- 
   });
- 
-  this.dispatchEvent(new this.Event('app-ready'));
 });
- 
+
+// cleanup code when window is closed
 window.on('close', function(){
   console.log("Window Closed");
 });
