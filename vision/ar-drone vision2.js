@@ -1,20 +1,15 @@
 var arDrone = require('ar-drone');
-var PaVEParser = require('ar-drone/lib/video/PaVEParser');
-
 var cv = require('opencv');
 
 var video = arDrone.createClient().getVideoStream();
-var parser = new PaVEParser();
+var camera = new cv.VideoCapture(0);
 
-parser
-.on('data', function(data) {
-	cv.readImage(data, function(err, im) {
-		im.save('test.png');
+setInterval(function() {
+	camera.read(function(err, im) {
+
+		im.save('/tmp/cam.png');
 	});
-	console.log('foo');
-})
-.on('end', function() {
-	console.log('bar');//output.end();
-});
 
-video.pipe(parser);
+}, 1000);
+
+video.pipe(camera);
