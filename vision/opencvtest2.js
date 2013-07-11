@@ -1,5 +1,6 @@
 var cv = require('opencv');
 var draw = require('./draw');
+var PNG = require('png-js');
 
 //(B)lue, (G)reen, (R)ed
 var lower_threshold = [80, 0, 0];
@@ -21,12 +22,20 @@ exports.getCenter = function getCenter(x, y, width, height) {
 }
 
 cv.readImage('./matrix.png', function(err, im_orig) {
-	var window = new cv.NamedWindow("example2", cv.CV_WINDOW_AUTOSIZE);
-	//MoveWindow("example2", 100, 100);    // to move the window to position 100 100.
 	var big = im_orig;
-	im_orig.inRange(lower_threshold, upper_threshold);
+	//im_orig.inRange(lower_threshold, upper_threshold);
+	
+
+	var myimage = new PNG('./png.png');
+
+	var width  = myimage.width;
+	var height = myimage.height;
+
+	myimage.decode(function (pixels) {
+	    console.log(pixels);
+	});
+	
 	im_orig.save('./color.png');
-	window.showImage("example2", im_orig );
 	im_orig.canny(lowThresh, highThresh);
 	im_orig.dilate(nIters);
 	im_orig.save('./canny.png');
