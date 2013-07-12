@@ -8,7 +8,7 @@ var GB = 0.586;
 
 var thres = 0.05;
 
-fs.createReadStream('png.png')
+fs.createReadStream('matrix.png')
 .pipe(new PNG({
 	filterType: 4
 }))

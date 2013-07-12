@@ -5,6 +5,7 @@ client.config('');
 client.on('navdata', navdata);
 
 var alt;
+var yaw;
 function navdata(data){
 	var datastr = JSON.stringify(data);
 	
@@ -20,19 +21,32 @@ function navdata(data){
 		if (current.indexOf('\"z\"') != -1 && current.indexOf('}}}}') != -1){
 			alt = -parse(current);
 		}
+		if (current.indexOf('yaw') != -1){
+			yaw = -parse(current);
+		}
 	}
-	console.log(alt);
 	if(go){
-		setAlt(1000);
+		//setAlt(1000);
+		setYaw(0);
 	}	
 	//process.exit(0);
 }
 
-function setAlt(altitude){
-	if(altitude > alt){
+function setAlt(setalt){
+	if(setalt > alt){
 		client.up(0.1);
 	} else {
 		client.down(0.1);
+	}
+}
+function setYaw(setyaw){
+	setyaw = Math.abs(setyaw - yaw);
+	if(yaw > setyaw){
+		client.clockwise(0.05);
+		console.log(yaw + "\tcw");
+	} else {
+		client.counterClockwise(0.05);
+		console.log(yaw + "\tccw");
 	}
 }
 

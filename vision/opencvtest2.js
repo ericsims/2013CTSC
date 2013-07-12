@@ -1,6 +1,7 @@
 var cv = require('opencv');
-var draw = require('./draw');
-var PNG = require('png-js');
+var ardrone = require('ar-drone');
+
+var s = new cv.ImageStream();
 
 //(B)lue, (G)reen, (R)ed
 var lower_threshold = [80, 0, 0];
@@ -15,27 +16,14 @@ var GREEN = [0, 255, 0]; //B, G, R
 var BLUE = [255, 0, 0]; //B, G, R
 var WHITE = [255, 255, 255]; //B, G, R
 
-exports.getCenter = function getCenter(x, y, width, height) {
-	var center_x = x + width/2;
-	var center_y = y + height/2;
-	return [center_x, center_y];
-}
+ardrone.createClient().getPngStream().pipe(s);
 
-cv.readImage('./matrix.png', function(err, im_orig) {
-	var big = im_orig;
-	//im_orig.inRange(lower_threshold, upper_threshold);
-	
-
-	var myimage = new PNG('./png.png');
-
-	var width  = myimage.width;
-	var height = myimage.height;
-
-	myimage.decode(function (pixels) {
-	    console.log(pixels);
-	});
-	
-	im_orig.save('./color.png');
+s.on('data', function(matrix){
+	matrix.save('./matrix.png');
+	var big = matrix;
+	var im_orig = matrix; 
+	im_orig.inRange(lower_threshold, upper_threshold);
+	//im_orig.save('./color.png');
 	im_orig.canny(lowThresh, highThresh);
 	im_orig.dilate(nIters);
 	im_orig.save('./canny.png');
@@ -48,11 +36,11 @@ cv.readImage('./matrix.png', function(err, im_orig) {
 		}
 	}
 
-	current = contours.boundingRect(largest_blob);
-	console.log(current.x +', '+current.y);
-	//draw.drawBoundingRect(big, contours, i, GREEN);
-	draw.drawCenter(big, contours, largest_blob, BLUE, exports.getCenter);
+	if(largest_blob != 0){
+		current = contours.boundingRect(largest_blob);
+		console.log(current.x +', '+current.y);
+	}
 
-
-	big.save('./big.png');
+	//big.save('./big.png');
+	//process.exit(0);
 });

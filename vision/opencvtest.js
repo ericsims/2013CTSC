@@ -7,7 +7,7 @@ var upper_threshold = [100, 50, 20];
 
 var lowThresh = 0;
 var highThresh = 100;
-var nIters = 2;
+var nIters = 10;
 var maxArea = 500;
 
 var GREEN = [0, 255, 0]; //B, G, R
