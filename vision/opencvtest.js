@@ -20,7 +20,7 @@ exports.getCenter = function getCenter(x, y, width, height) {
 	return [center_x, center_y];
 }
 
-cv.readImage('out.png', function(err, im_orig) {
+cv.readImage('matrix2.png', function(err, im_orig) {
 	var big = im_orig;
 	//im_orig.inRange(lower_threshold, upper_threshold);
 	im_orig.save('./color.png');

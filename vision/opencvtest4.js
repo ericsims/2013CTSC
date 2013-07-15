@@ -1,59 +1,83 @@
 var cv = require('opencv');
 var ardrone = require('ar-drone');
-var fs = require('fs'),
-PNG = require('pngjs').PNG;
+var PNGReader = require('png.js');
 
-var RG = 0.621;
-var RB = 0.364;
-var GB = 0.586;
+//(B)lue, (G)reen, (R)ed
+var targetColor = [103, 61, 36];
+var targetTreshold = 10;
+var targetWhiteBalance = 135.68;
 
-var thres = 0.05;
+var lowThresh = 0;
+var highThresh = 100;
+var nIters = 1;
+var maxArea = 500;
 
+var GREEN = [0, 255, 0]; //B, G, R
+var BLUE = [255, 0, 0]; //B, G, R
+var WHITE = [255, 255, 255]; //B, G, R
+
+exports.getCenter = function getCenter(x, y, width, height) {
+	var center_x = x + width/2;
+	var center_y = y + height/2;
+	return [center_x, center_y];
+};
 var s = new cv.ImageStream();
 
+var PNGReader = require('png.js');
 
 ardrone.createClient().getPngStream().pipe(s);
 
-s.on('data', function(matrix){
-	receiveData(matrix);
-	analysis();
-	//process.exit(1);
-},1000);
+s.on('data', function(matrix) {
+	var reader = new PNGReader(matrix);
+	reader.parse(function(err, png){
+		if (err) throw err;
+		var whiteBalance = 0;
+		var totalPixels = png.width * png.height;
+		for (var x = 0; x < png.width; x++){
+			for (var y = 0; y < png.height; y++){
+				var average = (png.getPixel(x,y)[0] + png.getPixel(x,y)[1] + png.getPixel(x,y)[2]) / 3;
+				whiteBalance += average;
+			}
+		}
+		whiteBalance = whiteBalance / totalPixels;
+		console.log(whiteBalance);
+		var whiteBalanceAdjust = whiteBalance / targetWhiteBalance;
+		var lower_threshold = [(targetColor[0] * whiteBalanceAdjust) - targetTreshold,
+		                       (targetColor[1] * whiteBalanceAdjust) - targetTreshold,
+		                       (targetColor[2] * whiteBalanceAdjust) - targetTreshold];
+		var upper_threshold = [(targetColor[0] * whiteBalanceAdjust) + targetTreshold,
+		                       (targetColor[1] * whiteBalanceAdjust) + targetTreshold,
+		                       (targetColor[2] * whiteBalanceAdjust) + targetTreshold];
 
+		console.log(lower_threshold);
+		console.log(upper_threshold);
 
-function receiveData(matrix){
-	matrix.save('matrix.png');
-}
+		var big = im_orig;
+		var im = im_orig;
+		im.inRange(lower_threshold, upper_threshold);
+		im.save('./color.png');
+		im.canny(lowThresh, highThresh);
+		im.dilate(nIters);
+		im.save('./canny.png');
 
-function analysis(){
-	fs.createReadStream('matrix.png')
-	.pipe(new PNG({
-		filterType: 4
-	}))
-	.on('parsed', function() {
+		var contours = im.findContours();
+		console.log(contours.toString());
 
-		for (var y = 0; y < this.height; y++) {
-			for (var x = 0; x < this.width; x++) {
-				var idx = (this.width * y + x) << 2;
-
-				var R = this.data[idx];
-				var G = this.data[idx+1];
-				var B = this.data[idx+2];
-
-				this.data[idx] = 0;
-				this.data[idx+1] = 0;
-				this.data[idx+2] = 0;
-
-				if((Math.abs(R/G - RG) < thres*RG)&
-						(Math.abs(R/B - RB) < thres*RB)&
-						(Math.abs(G/B - GB) < thres*GB)){
-					this.data[idx] = 255;
-					this.data[idx+1] = 255;
-					this.data[idx+2] = 255;
-				}
+		var largest_blob = 0;
+		for(i = 0; i < contours.size(); i++) {
+			if(contours.area(i) >contours.area(largest_blob)) {
+				largest_blob=i;
 			}
 		}
 
-		this.pack().pipe(fs.createWriteStream('out.png'));
+		big.drawAllContours(contours, BLUE);
+		var current = contours.boundingRect(largest_blob);
+		draw.drawCenter(big, contours, largest_blob, WHITE, exports.getCenter);
+
+		console.log(current.x +', '+current.y);
+
+		big.save('./big.png');
+
+		//process.exit(1);
 	});
-}
+}, 5000);
