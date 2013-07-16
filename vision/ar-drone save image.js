@@ -8,4 +8,4 @@ s.on('data', function(matrix){
 	console.log('saving...');
 	process.exit(0);
 },1000);
-ardrone.createClient().getPngStream().pipe(s);
+ardrone.createClient({ip: '192.168.1.10'}).getPngStream().pipe(s);

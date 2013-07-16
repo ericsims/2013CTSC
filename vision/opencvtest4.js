@@ -1,6 +1,11 @@
 var cv = require('opencv');
 var ardrone = require('ar-drone');
-var PNGReader = require('png.js');
+var PNG = require('png.js');
+
+var client = ardrone.createClient({ip: '192.168.1.10'});
+var pngStream = client.getPngStream();
+var s = new cv.ImageStream();
+
 
 //(B)lue, (G)reen, (R)ed
 var targetColor = [103, 61, 36];
@@ -21,14 +26,10 @@ exports.getCenter = function getCenter(x, y, width, height) {
 	var center_y = y + height/2;
 	return [center_x, center_y];
 };
-var s = new cv.ImageStream();
+pngStream.pipe(s);
 
-var PNGReader = require('png.js');
-
-ardrone.createClient().getPngStream().pipe(s);
-
-s.on('data', function(matrix) {
-	var reader = new PNGReader(matrix);
+s.on('data', function(im_orig) {
+	var reader = new PNG(im_orig);
 	reader.parse(function(err, png){
 		if (err) throw err;
 		var whiteBalance = 0;
