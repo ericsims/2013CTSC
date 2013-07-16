@@ -20,14 +20,3 @@ BLUE: [255,0,0]
 RED: [0,0,255]
 WHITE: [255,255,255]
 YELLOW: [0,255,255]
-  
-# Camera
-camera:
-  ip: 10.1.78.11
-  port: 80
-  username: FRC
-  password: FRC
-  resolution: 640x480
-  compression: 25
-  fps: 1
-  inchesPerPixel: 0.05 #Find using experimental value
