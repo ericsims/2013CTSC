@@ -1,5 +1,5 @@
 var cv = require('opencv');
-var draw = require('./draw');
+var draw = require('./components/draw');
 
 //(B)lue, (G)reen, (R)ed
 var lower_threshold = [80, 0, 0];
