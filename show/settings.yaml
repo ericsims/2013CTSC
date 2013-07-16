@@ -1,0 +1,33 @@
+# AR.Drone settings
+ardrone:
+  ip: 192.168.1.1
+
+# target1 color and whitebalance from static photo
+target1:
+  color: [103, 61, 36]
+  whitebalance: 135.68
+  
+opencv:
+  threshold: 10
+  lowThresh: 0
+  highThresh: 100
+  nIters: 1
+  maxArea: 500
+  
+# B, G, R
+GREEN: [0,255,0]
+BLUE: [255,0,0]
+RED: [0,0,255]
+WHITE: [255,255,255]
+YELLOW: [0,255,255]
+  
+# Camera
+camera:
+  ip: 10.1.78.11
+  port: 80
+  username: FRC
+  password: FRC
+  resolution: 640x480
+  compression: 25
+  fps: 1
+  inchesPerPixel: 0.05 #Find using experimental value

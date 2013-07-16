@@ -1,11 +1,9 @@
 var cv = require('opencv');
 var ardrone = require('ar-drone');
 var PNG = require('png.js');
-var draw = require('./components/draw');
 
 var client = ardrone.createClient({ip: '192.168.1.1'});
 var pngStream = client.getPngStream();
-var s = new cv.ImageStream();
 
 
 //(B)lue, (G)reen, (R)ed
@@ -24,7 +22,6 @@ var GREEN = [0, 255, 0]; //B, G, R
 var BLUE = [255, 0, 0]; //B, G, R
 var WHITE = [255, 255, 255]; //B, G, R
 
-pngStream.pipe(s);
 pngStream.on('data', readImage);
 
 
@@ -50,11 +47,11 @@ function calculateWhiteBalance(png, whiteBalance){
 	console.log(whiteBalance);
 	var whiteBalanceAdjust = whiteBalance / targetWhiteBalance;
 	lower_threshold = [(targetColor[0] * whiteBalanceAdjust) - targetTreshold,
-	                       (targetColor[1] * whiteBalanceAdjust) - targetTreshold,
-	                       (targetColor[2] * whiteBalanceAdjust) - targetTreshold];
+	                   (targetColor[1] * whiteBalanceAdjust) - targetTreshold,
+	                   (targetColor[2] * whiteBalanceAdjust) - targetTreshold];
 	upper_threshold = [(targetColor[0] * whiteBalanceAdjust) + targetTreshold,
-	                       (targetColor[1] * whiteBalanceAdjust) + targetTreshold,
-	                       (targetColor[2] * whiteBalanceAdjust) + targetTreshold];
+	                   (targetColor[1] * whiteBalanceAdjust) + targetTreshold,
+	                   (targetColor[2] * whiteBalanceAdjust) + targetTreshold];
 
 	//console.log(lower_threshold);
 	//console.log(upper_threshold);
@@ -63,13 +60,15 @@ function calculateWhiteBalance(png, whiteBalance){
 function cvProcess(err, im_orig) {
 	var big = im_orig;
 	var im = im_orig;
-	//im.save('./matrix.png');
+	if (saveFiles){
+		im.save('./matrix.png');
+	}
 	im.inRange(lower_threshold, upper_threshold);
-	//im.save('./color.png');
 	im.canny(lowThresh, highThresh);
 	im.dilate(nIters);
-	//im.save('./canny.png');
-
+	if (saveFiles){
+		im.save('./canny.png');
+	}
 	var contours = im.findContours();
 	var largest_blob = 0;
 	for(i = 0; i < contours.size(); i++) {
@@ -78,18 +77,12 @@ function cvProcess(err, im_orig) {
 		}
 	}
 
-	big.drawAllContours(contours, BLUE);
 	var current = contours.boundingRect(largest_blob);
-	draw.drawCenter(big, contours, largest_blob, WHITE, exports.getCenter);
 
 	console.log(current.x + ', ' +current.y);
-
-	//big.save('./big.png');
-
-	//process.exit(1);
 };
 
-exports.getCenter = function getCenter(x, y, width, height) {
+function getCenter(x, y, width, height) {
 	var center_x = x + width/2;
 	var center_y = y + height/2;
 	return [center_x, center_y];

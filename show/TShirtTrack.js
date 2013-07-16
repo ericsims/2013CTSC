@@ -1,0 +1,1 @@
+var detection = require('./components/detection');
