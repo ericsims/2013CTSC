@@ -1,41 +1,25 @@
 var cv = require('opencv');
-var ardrone = require('ar-drone');
 var PNG = require('png.js');
+var draw = require('./draw');
 
-var client = ardrone.createClient({ip: '192.168.1.1'});
-var pngStream = client.getPngStream();
-
-
-//(B)lue, (G)reen, (R)ed
-var targetColor = [103, 61, 36];
-var targetTreshold = 10;
-var targetWhiteBalance = 135.68;
-
-var lowThresh = 0;
-var highThresh = 100;
-var nIters = 1;
-var maxArea = 500;
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-var GREEN = [0, 255, 0]; //B, G, R
-var BLUE = [255, 0, 0]; //B, G, R
-var WHITE = [255, 255, 255]; //B, G, R
 
-pngStream.on('data', readImage);
-
-
-function readImage(data){
+exports.readImage = function readImage(data, settings){
 	var reader = new PNG(data);
+
 	reader.parse(function(err, png){
 		if (err) throw err;
 		var whiteBalance = 0;	
-		calculateWhiteBalance(png, whiteBalance);
-		cv.readImage(data, cvProcess);
+		calculateWhiteBalance(png, whiteBalance, settings);
+		cv.readImage(data, function(err, im){
+			cvProcess(err, im, settings);
+		});
 	});
 };
 
-function calculateWhiteBalance(png, whiteBalance){
+function calculateWhiteBalance(png, whiteBalance, settings){
 	var totalPixels = png.width * png.height;
 	for (var x = 0; x < png.width; x++){
 		for (var y = 0; y < png.height; y++){
@@ -44,42 +28,73 @@ function calculateWhiteBalance(png, whiteBalance){
 		}
 	}
 	whiteBalance = whiteBalance / totalPixels;
-	console.log(whiteBalance);
-	var whiteBalanceAdjust = whiteBalance / targetWhiteBalance;
-	lower_threshold = [(targetColor[0] * whiteBalanceAdjust) - targetTreshold,
-	                   (targetColor[1] * whiteBalanceAdjust) - targetTreshold,
-	                   (targetColor[2] * whiteBalanceAdjust) - targetTreshold];
-	upper_threshold = [(targetColor[0] * whiteBalanceAdjust) + targetTreshold,
-	                   (targetColor[1] * whiteBalanceAdjust) + targetTreshold,
-	                   (targetColor[2] * whiteBalanceAdjust) + targetTreshold];
+	var whiteBalanceAdjust = whiteBalance / settings.target1.whiteBalance;
+	if(settings.debug){
+		console.log('whiteBalance: ' + whiteBalance);
+		console.log('settings.target1.color: ' + settings.target1.color);
+		console.log('settings.opencv.threshold: ' + settings.opencv.threshold);
+		console.log('whiteBalanceAdjust: ' + whiteBalanceAdjust);
+	}
+	lower_threshold = [(settings.target1.color[0] * whiteBalanceAdjust) - settings.opencv.threshold,
+	                   (settings.target1.color[1] * whiteBalanceAdjust) - settings.opencv.threshold,
+	                   (settings.target1.color[2] * whiteBalanceAdjust) - settings.opencv.threshold];
+	upper_threshold = [(settings.target1.color[0] * whiteBalanceAdjust) + settings.opencv.threshold,
+	                   (settings.target1.color[1] * whiteBalanceAdjust) + settings.opencv.threshold,
+	                   (settings.target1.color[2] * whiteBalanceAdjust) + settings.opencv.threshold];
 
-	//console.log(lower_threshold);
-	//console.log(upper_threshold);
+	if(settings.debug){
+		console.log(lower_threshold);
+		console.log(upper_threshold);
+	}
 };
 
-function cvProcess(err, im_orig) {
+function cvProcess(err, im_orig, settings) {
 	var big = im_orig;
 	var im = im_orig;
-	if (saveFiles){
+	if(settings.opencv.saveFiles){
 		im.save('./matrix.png');
+		if(settings.debug){
+			console.log('matrix.png saved');
+		}
 	}
 	im.inRange(lower_threshold, upper_threshold);
-	im.canny(lowThresh, highThresh);
-	im.dilate(nIters);
-	if (saveFiles){
+	if(settings.opencv.saveFiles){
+		im.save('./color.png');
+		if(settings.debug){
+			console.log('color.png saved');
+		}
+	}
+	im.canny(settings.opencv.lowThresh, settings.opencv.highThresh);
+	im.dilate(settings.opencv.nIters);
+	if(settings.opencv.saveFiles){
 		im.save('./canny.png');
+		if(settings.debug){
+			console.log('canny.png saved');
+		}
 	}
 	var contours = im.findContours();
 	var largest_blob = 0;
 	for(i = 0; i < contours.size(); i++) {
-		if(contours.area(i) >contours.area(largest_blob)) {
+		if(contours.area(i) > contours.area(largest_blob)) {
 			largest_blob=i;
 		}
 	}
 
-	var current = contours.boundingRect(largest_blob);
+	if(contours.area(largest_blob) > settings.opencv.minArea) {
+		var current = contours.boundingRect(largest_blob);
+		console.log(current.x + ', ' +current.y);
+	} else {
+		console.log('no target found');
+	}
 
-	console.log(current.x + ', ' +current.y);
+	if(settings.opencv.saveFiles){
+		draw.drawCenter(big, contours, largest_blob, settings.WHITE, getCenter);
+		big.drawAllContours(contours, settings.BLUE);
+		big.save('./big.png');
+		if(settings.debug){
+			console.log('big.png saved');
+		}
+	}
 };
 
 function getCenter(x, y, width, height) {

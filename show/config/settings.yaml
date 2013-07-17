@@ -1,18 +1,24 @@
+# Debug mode
+debug: 0 # True/False
+
 # AR.Drone settings
 ardrone:
-  ip: 192.168.1.1
+  ip1: 192.168.1.10
+  ip2: 192.168.1.11
 
 # target1 color and whitebalance from static photo
 target1:
-  color: [103, 61, 36]
-  whitebalance: 135.68
+  color: [103,61,36]
+  whiteBalance: 135.68
   
+# OpenCV settings
 opencv:
-  threshold: 10
+  threshold: 10 # +/- for target color
   lowThresh: 0
   highThresh: 100
   nIters: 1
-  maxArea: 500
+  minArea: 1000
+  saveFiles: 1 # True/False
   
 # B, G, R
 GREEN: [0,255,0]

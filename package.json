@@ -1,6 +1,6 @@
 {
 	"name": "2013CTSC",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"author": "ericsims <EricSimsM@gmail.com>",
 	"description": "Code for AR.Drones and Nao Robots for the summer of 2013 at the CT Science Center",
 	"repository": {
@@ -8,8 +8,8 @@
 		"url": "https://github.com/ericsims/2013CTSC.git"
 	},
 	"dependencies" : {
-		"opencv"  : "0.0.12"
-		"js-yaml" : "2.0.x",
+		"opencv"  : "0.0.12",
+		"js-yaml" : "2.0.x"
 	},
 	"license": "MPL",
 	"engines": {
