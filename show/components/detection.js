@@ -14,7 +14,7 @@ exports.readImage = function readImage(data, settings){
 		var whiteBalance = 0;	
 		calculateWhiteBalance(png, whiteBalance, settings);
 		cv.readImage(data, function(err, im){
-			cvProcess(err, im, settings);
+			return cvProcess(err, im, settings);
 		});
 	});
 };
@@ -73,14 +73,24 @@ function cvProcess(err, im_orig, settings) {
 		}
 	}
 	var contours = im.findContours();
-	var largest_blob = 0;
-	for(i = 0; i < contours.size(); i++) {
-		if(contours.area(i) > contours.area(largest_blob)) {
-			largest_blob=i;
+	if(settings.debug){
+		console.log('found contours: ' + contours.size());
+		console.log(settings.opencv.minArea);
+	}
+	var largest_blob = -1;
+	if (contours.size() > 0){
+		for(i = 0; i < contours.size(); i++) {
+			var area = contours.area(i);
+			if(largest_blob != -1) {
+				if(area > contours.area(largest_blob) && area > settings.opencv.minArea) {
+					largest_blob=i;
+				}
+			} else {
+				largest_blob = i;
+			}
 		}
 	}
-
-	if(contours.area(largest_blob) > settings.opencv.minArea) {
+	if(largest_blob != -1) {
 		var current = contours.boundingRect(largest_blob);
 		console.log(current.x + ', ' +current.y);
 	} else {
@@ -94,6 +104,7 @@ function cvProcess(err, im_orig, settings) {
 		if(settings.debug){
 			console.log('big.png saved');
 		}
+		return big;
 	}
 };
 

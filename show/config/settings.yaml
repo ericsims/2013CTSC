@@ -17,7 +17,7 @@ opencv:
   lowThresh: 0
   highThresh: 100
   nIters: 1
-  minArea: 1000
+  minArea: 1500
   saveFiles: 1 # True/False
   
 # B, G, R

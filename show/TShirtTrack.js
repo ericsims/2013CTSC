@@ -12,6 +12,4 @@ var pngStream = client.getPngStream();
 
 pngStream.on('data', function(data){
 	detection.readImage(data, settings);
-}, 10000);
-
-
+});
