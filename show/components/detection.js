@@ -20,6 +20,10 @@ exports.readImage = function readImage(data, settings){
 };
 
 function calculateWhiteBalance(png, whiteBalance, settings){
+	if(settings.debug){
+		console.log('png.width: ' + png. width);
+		console.log('png.height: ' + png. height);
+	}
 	var totalPixels = png.width * png.height;
 	for (var x = 0; x < png.width; x++){
 		for (var y = 0; y < png.height; y++){
@@ -75,37 +79,47 @@ function cvProcess(err, im_orig, settings) {
 	var contours = im.findContours();
 	if(settings.debug){
 		console.log('found contours: ' + contours.size());
-		console.log(settings.opencv.minArea);
+		console.log('settings.opencv.minArea: ' + settings.opencv.minArea);
 	}
 	var largest_blob = -1;
 	if (contours.size() > 0){
 		for(i = 0; i < contours.size(); i++) {
 			var area = contours.area(i);
-			if(largest_blob != -1) {
-				if(area > contours.area(largest_blob) && area > settings.opencv.minArea) {
-					largest_blob=i;
+			if(area > settings.opencv.minArea){
+				if(largest_blob != -1) {
+					if(area > contours.area(largest_blob)) {
+						largest_blob=i;
+					}
+				} else {
+					largest_blob = i;
 				}
-			} else {
-				largest_blob = i;
+			}
+		}
+		if(largest_blob != -1) {
+			var current = contours.boundingRect(largest_blob);
+			console.log(current.x + ', ' + current.y);
+			if(current.x == 1 || current.x == settings.opencv.width
+					|| current.y == 1 || current.y == settings.opencv.height){
+				largest_blob = -1;
 			}
 		}
 	}
-	if(largest_blob != -1) {
-		var current = contours.boundingRect(largest_blob);
-		console.log(current.x + ', ' +current.y);
-	} else {
+	if(largest_blob == -1) {
 		console.log('no target found');
 	}
 
 	if(settings.opencv.saveFiles){
-		draw.drawCenter(big, contours, largest_blob, settings.WHITE, getCenter);
-		big.drawAllContours(contours, settings.BLUE);
+		if (contours.size() > 0){
+			big.drawAllContours(contours, settings.WHITE);
+			draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
+		}
 		big.save('./big.png');
 		if(settings.debug){
 			console.log('big.png saved');
 		}
-		return big;
+		big;
 	}
+	return current;
 };
 
 function getCenter(x, y, width, height) {

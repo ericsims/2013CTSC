@@ -8,7 +8,7 @@ client
 .after(5000, function() {
 	this.calibrate(0);
 })
-.after(10000, function() {
+.after(5000, function() {
 	this.stop();
 	this.land();
 })

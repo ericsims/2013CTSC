@@ -23,10 +23,10 @@ exports.getCenter = function getCenter(x, y, width, height) {
 	return [center_x, center_y];
 };
 
-cv.readImage('matrix2.png', function(err, im_orig) {
+cv.readImage('matrix.png', function(err, im_orig) {
 	var whiteBalance = 0;
 
-	fs.readFile('matrix2.png', function(err, bytes){
+	fs.readFile('matrix.png', function(err, bytes){
 		var reader = new PNGReader(bytes);
 		reader.parse(function(err, png){
 			if (err) throw err;
