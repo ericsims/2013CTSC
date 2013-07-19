@@ -5,18 +5,18 @@ var draw = require('./draw');
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-
+var XY;
 exports.readImage = function readImage(data, settings){
 	var reader = new PNG(data);
-
 	reader.parse(function(err, png){
 		if (err) throw err;
 		var whiteBalance = 0;	
 		calculateWhiteBalance(png, whiteBalance, settings);
 		cv.readImage(data, function(err, im){
-			return cvProcess(err, im, settings);
+			XY = exports.cvProcess(err, im, settings);
 		});
 	});
+	return XY;
 };
 
 function calculateWhiteBalance(png, whiteBalance, settings){
@@ -52,7 +52,7 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 	}
 };
 
-function cvProcess(err, im_orig, settings) {
+exports.cvProcess = function cvProcess(err, im_orig, settings) {
 	var big = im_orig;
 	var im = im_orig;
 	if(settings.opencv.saveFiles){
@@ -97,29 +97,36 @@ function cvProcess(err, im_orig, settings) {
 		}
 		if(largest_blob != -1) {
 			var current = contours.boundingRect(largest_blob);
-			console.log(current.x + ', ' + current.y);
 			if(current.x == 1 || current.x == settings.opencv.width
 					|| current.y == 1 || current.y == settings.opencv.height){
 				largest_blob = -1;
 			}
 		}
 	}
-	if(largest_blob == -1) {
-		console.log('no target found');
+	if(settings.debug){
+		if(largest_blob != -1) {
+			console.log(current.x + ', ' + current.y);
+		} else {
+			console.log('no target found');
+		}
 	}
 
 	if(settings.opencv.saveFiles){
-		if (contours.size() > 0){
-			big.drawAllContours(contours, settings.WHITE);
-			draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
+		if(largest_blob != -1) {
+			if (contours.size() > 0){
+				big.drawAllContours(contours, settings.WHITE);
+				draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
+			}
+			big.save('./big.png');
+			if(settings.debug){
+				console.log('big.png saved');
+			}
+			big;
+			return [current.x, current.y];
+		} else {
+			return;
 		}
-		big.save('./big.png');
-		if(settings.debug){
-			console.log('big.png saved');
-		}
-		big;
 	}
-	return current;
 };
 
 function getCenter(x, y, width, height) {
