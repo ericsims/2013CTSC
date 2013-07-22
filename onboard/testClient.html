@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>Hello World!</title>
+<meta charset="utf-8">
+
+<script src="http://localhost:8000/socket.io/socket.io.js"></script>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript">
+            $(document).ready(function(){
+                var socket = io.connect('http://localhost:8000');
+                $("#button").click(function() {
+                    socket.emit('my event' ,"Hello World!");
+                })
+            })
+        </script>
+</head>
+
+<body>
+	<button type="button" id='button'>Send Message</button>
+</body>
+
+</html>
