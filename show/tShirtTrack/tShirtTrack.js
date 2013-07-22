@@ -24,6 +24,9 @@ client
 		if(XY){
 			console.log(XY);
 			centerTarget(XY);
+		} else {
+			console.log('center');
+			client.stop();
 		}
 	});
 })
@@ -47,6 +50,7 @@ function centerTarget(cordinates){
 		console.log('right');
 		client.clockwise(settings.speed);
 	} else {
+		console.log('center');
 		client.stop();
 	}
 }

@@ -1,5 +1,5 @@
 var arDrone = require('ar-drone');
-var client = arDrone.createClient();
+var client = arDrone.createClient({ip: '192.168.1.10'});
 client.config('control:altitude_max', 1500);
 client.config('');
 client.on('navdata', navdata);
@@ -26,13 +26,14 @@ function navdata(data){
 		}
 	}
 	if(go){
-		//setAlt(1000);
-		setYaw(0);
+		setAlt(1000);
+		//setYaw(0);
 	}	
 	//process.exit(0);
 }
 
 function setAlt(setalt){
+	console.log('alt: ' + alt);
 	if(setalt > alt){
 		client.up(0.1);
 	} else {
@@ -55,7 +56,7 @@ function parse(current){
 }
 
 var go = false;
-client.takeoff();
+//client.takeoff();
 client
 .after(5000, function() {
 	go = true;

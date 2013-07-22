@@ -1,7 +1,7 @@
 var arDrone = require('ar-drone');
 var client = arDrone.createClient({ip: '192.168.1.10'});
 
-client.config('control:altitude_max', 500);
+client.config('control:altitude_max', 750);
 
 client.on('navdata', console.log);
 

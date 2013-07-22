@@ -1,7 +1,7 @@
 require('js-yaml');
 var vapix = require('vapix');
 var detection = require('./components/detection');
-//var ardrone = require('ar-drone');
+var ardrone = require('ar-drone');
 var settings = require('./config/settings.yaml');
 
 if(settings.debug){
@@ -22,46 +22,48 @@ mjpg = camera.createVideoStream({
 	fps: settings.camera.fps
 });
 
-//var client = ardrone.createClient({ip: settings.ardrone.ip1});
+var client = ardrone.createClient({ip: settings.ardrone.ip1});
 
-//client.config('control:altitude_max', 1500);
+client.config('control:altitude_max', 1000);
 
-mjpg.on('data', function(data) {
-	var XY = detection.readImage(data, settings);
-	if(XY){
-		console.log(XY);
-		//centerTarget(XY);
-	}
-});
-
-/*client
-.after(10000, function() {
-	//this.takeoff();
+client
+.after(5000, function() {
+	this.takeoff();
 })
 .after(5000, function() {
 
-
+	mjpg.on('data', function(data) {
+		var XY = detection.readImage(data, settings);
+		if(XY){
+			centerTarget(XY);
+			//console.log(XY);
+		} else {
+			console.log('stop');
+			client.stop();
+		}
+	});
 })
-.after(10000, function() {
+.after(20000, function() {
 	this.stop();
 	this.land();
 })
 .after(1000, function() {
 	process.exit(1);
-});*/
+});
 
 function centerTarget(cordinates){
 	x_center = settings.opencv.width / 2;
 	y_center = settings.opencv.height / 2;
 
 	LR = cordinates[0] - x_center;
-	if(LR < -25) {
+	if(LR < -50) {
 		console.log('left');
-		client.counterClockwise(settings.speed);
-	} else if(LR > 25) {
+		client.left(settings.speed);
+	} else if(LR > 50) {
 		console.log('right');
-		client.clockwise(settings.speed);
+		client.right(settings.speed);
 	} else {
+		console.log('center');
 		client.stop();
 	}
 }
