@@ -33,10 +33,11 @@ client
 .after(5000, function() {
 
 	mjpg.on('data', function(data) {
-		var XY = detection.readImage(data, settings);
-		if(XY){
-			centerTarget(XY);
-			//console.log(XY);
+		var ardronepos = detection.readImage(data, settings, settings.ardrone.color);
+		var targetpos = detection.readImage(data, settings, settings.target1.color);
+		if(ardronepos){
+			setARDronePos(ardronepos, settings.opencv.width / 2);
+			console.log("ar: " + ardronepos + "trgt: " + targetpos);
 		} else {
 			console.log('stop');
 			client.stop();
@@ -51,11 +52,8 @@ client
 	process.exit(1);
 });
 
-function centerTarget(cordinates){
-	x_center = settings.opencv.width / 2;
-	y_center = settings.opencv.height / 2;
-
-	LR = cordinates[0] - x_center;
+function setARDronePos(pos, targetpos){
+	LR = pos[0] - targetpos;
 	if(LR < -50) {
 		console.log('left');
 		client.left(settings.speed);

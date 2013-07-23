@@ -4,8 +4,8 @@ debug: 0 # True/False
 # AR.Drone settings
 ardrone:
   ip1: 192.168.1.10
-  ip2: 192.168.1.11
   speed: 0.05 # 0 to 1
+  color: [235,20,20]
   
 # Camera
 camera:
@@ -17,9 +17,9 @@ camera:
   compression: 30
   fps: 10
 
-# target1 color and whitebalance from static photo
+# target1 color from static photo
 target1:
-  color: [235,20,20]
+  color: [135,210,230]
   
 # OpenCV settings
 opencv:

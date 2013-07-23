@@ -3,15 +3,15 @@ var PNG = require('png.js');
 var draw = require('./draw');
 
 var XY;
-exports.readImage = function readImage(data, settings){
+exports.readImage = function readImage(data, settings, color){
 	cv.readImage(data, function(err, im){
-		XY = exports.cvProcess(err, im, settings);
+		XY = exports.cvProcess(err, im, settings, color);
 	});
 	return XY;
 };
 
 
-exports.cvProcess = function cvProcess(err, im_orig, settings) {
+exports.cvProcess = function cvProcess(err, im_orig, settings, color) {
 	var big = im_orig;
 	var im = im_orig;
 	if(settings.opencv.saveFiles){
@@ -21,12 +21,12 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 		}
 	}
 
-	lower_threshold = [settings.target1.color[0] - settings.opencv.threshold,
-	                   settings.target1.color[1] - settings.opencv.threshold,
-	                   settings.target1.color[2] - settings.opencv.threshold];
-	upper_threshold = [settings.target1.color[0] + settings.opencv.threshold,
-	                   settings.target1.color[1] + settings.opencv.threshold,
-	                   settings.target1.color[2] + settings.opencv.threshold];
+	lower_threshold = [color[0] - settings.opencv.threshold,
+	                   color[1] - settings.opencv.threshold,
+	                   color[2] - settings.opencv.threshold];
+	upper_threshold = [color[0] + settings.opencv.threshold,
+	                   color[1] + settings.opencv.threshold,
+	                   color[2] + settings.opencv.threshold];
 
 	im.inRange(lower_threshold, upper_threshold);
 	if(settings.opencv.saveFiles){
