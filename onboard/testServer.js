@@ -8,10 +8,11 @@ var server = net.createServer(function(c) { //'connection' listener
 		if(data.toString().indexOf("heat") !== -1){
 		value = parseInt(data.toString().substring(4));
 		console.log(value);
-		c.write('on\r\n');
+		c.write('on\n');
 	}
 	});
 });
+
 server.listen(8124, function() { //'listening' listener
 	console.log('server bound');
 });
