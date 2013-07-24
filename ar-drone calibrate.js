@@ -13,5 +13,5 @@ client
 	this.land();
 })
 .after(1000, function() {
-	progess.exit(1);
+	process.exit();
 });

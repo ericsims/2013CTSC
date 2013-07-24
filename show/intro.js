@@ -11,7 +11,7 @@ client
 	this.up(0.25);
 })
 .after(5000, function() {
-	this.animate('flipAhead', 500);
+	this.animate('flipRight', 500);
 })
 .after(10000, function() {
 	this.stop();

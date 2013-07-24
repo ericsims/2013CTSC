@@ -7,7 +7,7 @@ client.on('navdata', console.log);
 
 client.takeoff();
 client
-.after(5000, function() {
+.after(15000, function() {
 	this.stop();
 	this.land();
 })
