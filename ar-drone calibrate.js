@@ -3,7 +3,9 @@ var client = arDrone.createClient({ip: '192.168.1.10'});
 
 client.config('control:altitude_max', 500);
 
-client.takeoff();
+
+client.ftrim();
+//client.takeoff();
 client
 .after(5000, function() {
 	this.calibrate(0);
