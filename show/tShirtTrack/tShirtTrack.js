@@ -14,8 +14,8 @@ client.config('control:altitude_max', 1500);
 
 
 client
-.after(10000, function() {
-	//this.takeoff();
+.after(1000, function() {
+	this.takeoff();
 })
 .after(5000, function() {
 

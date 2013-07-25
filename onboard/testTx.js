@@ -10,11 +10,13 @@ serialPort.on('open',function() {
 	var last = 0;
 	setInterval(function (){
 		if(last > 0){
-			serialPort.write("0\n");
+			serialPort.write('0');
+			serialPort.write('\n');
 			console.log("0");
 			last = 0;
 		} else {
-			serialPort.write("100\n");
+			serialPort.write('100');
+			serialPort.write('\n');
 			console.log("100");
 			last = 10;
 		}
