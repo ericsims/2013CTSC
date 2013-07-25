@@ -9,15 +9,15 @@ ardrone:
 
 # target1 color and whitebalance from static photo
 target1:
-  color: [87,135,254] #[135,210,230]
-  whiteBalance: 137.5 #69.15
+  color: [100,168,162] #[117,164,147]
+  whiteBalance: 141 #76
   
 # OpenCV settings
 opencv:
-  threshold: 35 # +/- for target color
+  threshold: 10 # +/- for target color
   lowThresh: 0
   highThresh: 100
-  nIters: 5
+  nIters: 10
   minArea: 1000
   width: 640
   height: 360

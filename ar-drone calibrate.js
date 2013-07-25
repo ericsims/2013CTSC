@@ -1,5 +1,5 @@
 var arDrone = require('ar-drone');
-var client = arDrone.createClient({ip: '192.168.1.10'});
+var client = arDrone.createClient({ip: '192.168.1.11'});
 
 client.config('control:altitude_max', 500);
 

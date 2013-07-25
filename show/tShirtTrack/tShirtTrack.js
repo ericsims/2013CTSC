@@ -10,27 +10,27 @@ if(settings.debug){
 var client = ardrone.createClient({ip: settings.ardrone.ip1});
 var pngStream = client.getPngStream();
 
-client.config('control:altitude_max', 1500);
+client.config('control:altitude_max', 500);
 
 
 client
 .after(1000, function() {
-	this.takeoff();
+	//this.takeoff();
 })
 .after(5000, function() {
 
 	pngStream.on('data', function(data){
-		var XY = detection.readImage(data, settings);
-		if(XY){
-			console.log(XY);
-			centerTarget(XY);
+		var XYZ = detection.readImage(data, settings);
+		if(XYZ){
+			console.log(XYZ);
+			centerTarget(XYZ);
 		} else {
-			console.log('center');
+			console.log('stop');
 			client.stop();
 		}
 	});
 })
-.after(10000, function() {
+.after(100000000, function() {
 	this.stop();
 	this.land();
 })
@@ -43,6 +43,7 @@ function centerTarget(cordinates){
 	y_center = settings.opencv.height / 2;
 
 	LR = cordinates[0] - x_center;
+	FB = cordinates[2];
 	if(LR < -25) {
 		console.log('left');
 		client.counterClockwise(settings.speed);
@@ -50,7 +51,17 @@ function centerTarget(cordinates){
 		console.log('right');
 		client.clockwise(settings.speed);
 	} else {
-		console.log('center');
+		console.log('LR center');
+		client.stop();
+	}
+	if(FB > 4) {
+		console.log('front');
+		client.front(settings.speed);
+	} else if(FB < 2) {
+		console.log('back');
+		client.back(settings.speed * 1.5);
+	} else {
+		console.log('FB center');
 		client.stop();
 	}
 }

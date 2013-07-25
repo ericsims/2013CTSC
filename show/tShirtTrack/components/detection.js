@@ -96,40 +96,41 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 			}
 		}
 		if(largest_blob != -1) {
-			var current = contours.boundingRect(largest_blob);
+						var current = contours.boundingRect(largest_blob);
 			if(current.x == 1 || current.x == settings.opencv.width
 					|| current.y == 1 || current.y == settings.opencv.height){
 				largest_blob = -1;
 			}
+			var center = getCenter(current.x, current.y, current.width, current.height, settings);
+			var distance = (1.0355/(current.width)*(2.08/0.010));//Math.sqrt(contours.area(largest_blob)
 		}
 	}
 	if(settings.debug){
 		if(largest_blob != -1) {
-			console.log(current.x + ', ' + current.y);
+			console.log(center[0] + ', ' + center[1]);
 		} else {
 			console.log('no target found');
 		}
 	}
 
 	if(settings.opencv.saveFiles){
-		if(largest_blob != -1) {
-			if (contours.size() > 0){
-				big.drawAllContours(contours, settings.WHITE);
-				draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
-			}
-			big.save('./big.png');
-			if(settings.debug){
-				console.log('big.png saved');
-			}
-			big;
-			return [current.x, current.y];
-		} else {
-			return;
+		if (largest_blob != -1){
+			big.drawAllContours(contours, settings.WHITE);
+			draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
 		}
+		big.save('./big.png');
+		if(settings.debug){
+			console.log('big.png saved');
+		}
+	}
+	if(largest_blob != -1) {
+		return [center[0], center[1], distance];
+	} else {
+		return;
 	}
 };
 
-function getCenter(x, y, width, height) {
+function getCenter(x, y, width, height, settings) {
 	var center_x = x + width/2;
 	var center_y = y + height/2;
 	return [center_x, center_y];
