@@ -7,7 +7,7 @@ var http = require('http');
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-var serverImg;
+var serverImg1, serverImg2;
 
 var XYZ;
 exports.readImage = function readImage(data, settings){
@@ -58,7 +58,14 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 
 
 var server = http.createServer(function(req, res) {
-	if (!serverImg) {
+	if (!serverImg1) {
+		res.writeHead(503);
+		res.end('Did not receive any png data yet.');
+		return;
+	}
+});
+var server2 = http.createServer(function(req, res) {
+	if (!serverImg2) {
 		res.writeHead(503);
 		res.end('Did not receive any png data yet.');
 		return;
@@ -67,16 +74,29 @@ var server = http.createServer(function(req, res) {
 
 server.on('request', function (req, res) {
 	res.writeHead(200, {'Content-Type': 'image/png'});
-	res.end(serverImg);
+	res.end(serverImg1);
+	if (serverImg2) {
+		console.log('2');
+		res.writeHead(200, {'Content-Type': 'image/png'});
+		res.end(serverImg2);
+	}
+});
+server2.on('request', function (req, res) {
+	res.writeHead(200, {'Content-Type': 'image/png'});
+	res.end(serverImg2);
 });
 
 server.listen(8080, function() {
 	console.log('Serving latest png on port 8080 ...');
 });
+server2.listen(8081, function() {
+	console.log('Serving latest png on port 8081 ...');
+});
 
 exports.cvProcess = function cvProcess(err, im_orig, settings) {
 	var big = im_orig;
 	var im = im_orig;
+	serverImg1 = im.toBuffer();
 	if(settings.opencv.saveFiles){
 		im.save('./matrix.png');
 		if(settings.debug){
@@ -98,8 +118,6 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 			console.log('canny.png saved');
 		}
 	}
-
-	//serverImg = im.toBuffer();
 
 	var contours = im.findContours();
 	if(settings.debug){
@@ -136,7 +154,6 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 			if(settings.debug){
 				console.log('center: ' + center);
 			}
-			console.log('contours.area: ' + contours.area(largest_blob));
 			var distance = 215.4 / ( Math.sqrt(contours.area(largest_blob)) );//Math.sqrt(contours.area(largest_blob)) or current.width
 		}
 	}
@@ -148,11 +165,14 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 		}
 	}
 
+	if (largest_blob != -1){
+		big.drawAllContours(contours, settings.WHITE);
+		draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
+		serverImg2 = big.toBuffer();
+	}
+
+	
 	if(settings.opencv.saveFiles){
-		if (largest_blob != -1){
-			big.drawAllContours(contours, settings.WHITE);
-			draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
-		}
 		big.save('./big.png');
 		if(settings.debug){
 			console.log('big.png saved');
