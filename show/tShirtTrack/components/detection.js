@@ -1,11 +1,15 @@
 var cv = require('opencv');
 var PNG = require('png.js');
 var draw = require('./draw');
+var http = require('http');
+//var server = require('./server');
 
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-var XY;
+var serverImg;
+
+var XYZ;
 exports.readImage = function readImage(data, settings){
 	var reader = new PNG(data);
 	reader.parse(function(err, png){
@@ -13,10 +17,10 @@ exports.readImage = function readImage(data, settings){
 		var whiteBalance = 0;	
 		calculateWhiteBalance(png, whiteBalance, settings);
 		cv.readImage(data, function(err, im){
-			XY = exports.cvProcess(err, im, settings);
+			XYZ = exports.cvProcess(err, im, settings);
 		});
 	});
-	return XY;
+	return XYZ;
 };
 
 function calculateWhiteBalance(png, whiteBalance, settings){
@@ -52,6 +56,24 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 	}
 };
 
+
+var server = http.createServer(function(req, res) {
+	if (!serverImg) {
+		res.writeHead(503);
+		res.end('Did not receive any png data yet.');
+		return;
+	}
+});
+
+server.on('request', function (req, res) {
+	res.writeHead(200, {'Content-Type': 'image/png'});
+	res.end(serverImg);
+});
+
+server.listen(8080, function() {
+	console.log('Serving latest png on port 8080 ...');
+});
+
 exports.cvProcess = function cvProcess(err, im_orig, settings) {
 	var big = im_orig;
 	var im = im_orig;
@@ -76,13 +98,16 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 			console.log('canny.png saved');
 		}
 	}
+
+	//serverImg = im.toBuffer();
+
 	var contours = im.findContours();
 	if(settings.debug){
 		console.log('found contours: ' + contours.size());
 		console.log('settings.opencv.minArea: ' + settings.opencv.minArea);
 	}
 	var largest_blob = -1;
-	if (contours.size() > 0){
+	if (contours.size() > 0 ){
 		for(i = 0; i < contours.size(); i++) {
 			var area = contours.area(i);
 			if(area > settings.opencv.minArea){
@@ -95,14 +120,24 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 				}
 			}
 		}
+		if(settings.debug){
+			console.log('largest_blob: ' + largest_blob);
+		}
+
 		if(largest_blob != -1) {
-						var current = contours.boundingRect(largest_blob);
+			var current = contours.boundingRect(largest_blob);
 			if(current.x == 1 || current.x == settings.opencv.width
 					|| current.y == 1 || current.y == settings.opencv.height){
 				largest_blob = -1;
 			}
+		}
+		if(largest_blob != -1) {
 			var center = getCenter(current.x, current.y, current.width, current.height, settings);
-			var distance = (1.0355/( Math.sqrt(contours.area(largest_blob)) )*(2.08/0.010));//Math.sqrt(contours.area(largest_blob)) or current.width
+			if(settings.debug){
+				console.log('center: ' + center);
+			}
+			console.log('contours.area: ' + contours.area(largest_blob));
+			var distance = 215.4 / ( Math.sqrt(contours.area(largest_blob)) );//Math.sqrt(contours.area(largest_blob)) or current.width
 		}
 	}
 	if(settings.debug){

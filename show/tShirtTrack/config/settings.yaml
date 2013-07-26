@@ -1,5 +1,5 @@
 # Debug mode
-debug: 0 # True/False
+debug: 1 # True/False
 
 # AR.Drone settings
 ardrone:
@@ -21,7 +21,7 @@ opencv:
   minArea: 1000
   width: 640
   height: 360
-  saveFiles: 1 # True/False
+  saveFiles: 0 # True/False
   
 # B, G, R
 GREEN: [0,255,0]

@@ -8,24 +8,20 @@ console.log('Connecting png stream ...');
 var pngStream = arDrone.createClient({ip: '192.168.1.10'}).getPngStream();
 
 var lastPng;
-pngStream
-.on('error', console.log)
-.on('data', function(pngBuffer) {
+pngStream.on('error', console.log);
+pngStream.on('data', function(pngBuffer) {
 	lastPng = pngBuffer;
 });
 
 var server = http.createServer(function(req, res) {
-	pngStream
-	.on('error', console.log)
-	.on('data', function(pngBuffer) {
-		lastPng = pngBuffer;
-	});
 	if (!lastPng) {
 		res.writeHead(503);
 		res.end('Did not receive any png data yet.');
 		return;
 	}
+});
 
+server.on('request', function (req, res) {
 	res.writeHead(200, {'Content-Type': 'image/png'});
 	res.end(lastPng);
 });

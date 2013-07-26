@@ -10,7 +10,7 @@ client
 	client.takeoff();
 })
 .after(5000, function() {
-	this.calibrate(0);
+	//this.calibrate(0);
 })
 .after(5000, function() {
 	this.stop();
