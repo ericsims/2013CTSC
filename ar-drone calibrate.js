@@ -5,8 +5,10 @@ client.config('control:altitude_max', 500);
 
 
 client.ftrim();
-//client.takeoff();
 client
+.after(5000, function() {
+	client.takeoff();
+})
 .after(5000, function() {
 	this.calibrate(0);
 })

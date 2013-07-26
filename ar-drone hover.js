@@ -5,14 +5,9 @@ client.config('control:altitude_max', 1000);
 
 client.on('navdata', console.log);
 
-client.config('control:ardrone_at_set_flat_trim', 1);
+client.takeoff();
 client
-.after(10000, function() {
-
-	process.exit();
-	//client.takeoff();
-})
-.after(90000, function() {
+.after(5000, function() {
 	this.stop();
 	this.land();
 })

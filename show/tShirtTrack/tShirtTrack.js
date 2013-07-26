@@ -22,7 +22,7 @@ client
 	pngStream.on('data', function(data){
 		var XYZ = detection.readImage(data, settings);
 		if(XYZ){
-			console.log(XYZ);
+			//console.log(XYZ);
 			centerTarget(XYZ);
 		} else {
 			console.log('stop');
@@ -45,19 +45,19 @@ function centerTarget(cordinates){
 	LR = cordinates[0] - x_center;
 	FB = cordinates[2];
 	if(LR < -25) {
-		console.log('left');
+		process.stdout.write('left\t\t');
 		client.counterClockwise(settings.speed);
 	} else if(LR > 25) {
-		console.log('right');
+		process.stdout.write('right\t\t');
 		client.clockwise(settings.speed);
 	} else {
-		console.log('LR center');
+		process.stdout.write('LR center\t\t');
 		client.stop();
 	}
-	if(FB > 4) {
+	if(FB > 3.5) {
 		console.log('front');
 		client.front(settings.speed);
-	} else if(FB < 2) {
+	} else if(FB < 2.5) {
 		console.log('back');
 		client.back(settings.speed * 1.5);
 	} else {

@@ -102,7 +102,7 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 				largest_blob = -1;
 			}
 			var center = getCenter(current.x, current.y, current.width, current.height, settings);
-			var distance = (1.0355/(current.width)*(2.08/0.010));//Math.sqrt(contours.area(largest_blob)
+			var distance = (1.0355/( Math.sqrt(contours.area(largest_blob)) )*(2.08/0.010));//Math.sqrt(contours.area(largest_blob)) or current.width
 		}
 	}
 	if(settings.debug){
