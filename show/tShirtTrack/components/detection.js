@@ -55,9 +55,8 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 };
 
 exports.cvProcess = function cvProcess(err, im_orig, settings) {
-	var big = im_orig;
-	var im = im_orig;
-	server.send_next(im);
+	var big = im_orig.copy();
+	var im = im_orig.copy();
 	if(settings.opencv.saveFiles){
 		im.save('./matrix.png');
 		if(settings.debug){
@@ -128,10 +127,13 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 
 	if (largest_blob != -1){
 		big.drawAllContours(contours, settings.WHITE);
+		big.drawContour(contours, largest_blob, settings.BLUE);
+		draw.drawBoundingRect(big, current, settings.RED);
 		draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
 	}
 
-	
+	server.update(big.toBuffer());
+
 	if(settings.opencv.saveFiles){
 		big.save('./big.png');
 		if(settings.debug){

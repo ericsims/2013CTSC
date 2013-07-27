@@ -6,11 +6,11 @@
  * @param int index Index in array to draw
  * @param array Array of B,G,R int values of a color to draw with
  */
-exports.drawBoundingRect = function(im, contours, index, color) {
-	var firstCorner =  [contours.boundingRect(index).x, contours.boundingRect(index).y];
-	var secondCorner = [contours.boundingRect(index).x + contours.boundingRect(index).width, contours.boundingRect(index).y];
-	var thirdCorner =  [contours.boundingRect(index).x, contours.boundingRect(index).y + contours.boundingRect(index).height];
-	var fourthCorner = [contours.boundingRect(index).x + contours.boundingRect(index).width, contours.boundingRect(index).y + contours.boundingRect(index).height]
+exports.drawBoundingRect = function(im, boundingRect, color) {
+	var firstCorner =  [boundingRect.x, boundingRect.y];
+	var secondCorner = [boundingRect.x + boundingRect.width, boundingRect.y];
+	var thirdCorner =  [boundingRect.x, boundingRect.y + boundingRect.height];
+	var fourthCorner = [boundingRect.x + boundingRect.width, boundingRect.y + boundingRect.height]
 
 	im.line(firstCorner, secondCorner, color);
 	im.line(secondCorner, fourthCorner, color);
