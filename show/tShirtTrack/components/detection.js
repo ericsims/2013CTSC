@@ -2,12 +2,10 @@ var cv = require('opencv');
 var PNG = require('png.js');
 var draw = require('./draw');
 var http = require('http');
-//var server = require('./server');
+var server = require('./mjpeg-stream');
 
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
-
-var serverImg1, serverImg2;
 
 var XYZ;
 exports.readImage = function readImage(data, settings){
@@ -56,47 +54,10 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 	}
 };
 
-
-var server = http.createServer(function(req, res) {
-	if (!serverImg1) {
-		res.writeHead(503);
-		res.end('Did not receive any png data yet.');
-		return;
-	}
-});
-var server2 = http.createServer(function(req, res) {
-	if (!serverImg2) {
-		res.writeHead(503);
-		res.end('Did not receive any png data yet.');
-		return;
-	}
-});
-
-server.on('request', function (req, res) {
-	res.writeHead(200, {'Content-Type': 'image/png'});
-	res.end(serverImg1);
-	if (serverImg2) {
-		console.log('2');
-		res.writeHead(200, {'Content-Type': 'image/png'});
-		res.end(serverImg2);
-	}
-});
-server2.on('request', function (req, res) {
-	res.writeHead(200, {'Content-Type': 'image/png'});
-	res.end(serverImg2);
-});
-
-server.listen(8080, function() {
-	console.log('Serving latest png on port 8080 ...');
-});
-server2.listen(8081, function() {
-	console.log('Serving latest png on port 8081 ...');
-});
-
 exports.cvProcess = function cvProcess(err, im_orig, settings) {
 	var big = im_orig;
 	var im = im_orig;
-	serverImg1 = im.toBuffer();
+	server.send_next(im);
 	if(settings.opencv.saveFiles){
 		im.save('./matrix.png');
 		if(settings.debug){
@@ -168,7 +129,6 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 	if (largest_blob != -1){
 		big.drawAllContours(contours, settings.WHITE);
 		draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
-		serverImg2 = big.toBuffer();
 	}
 
 	
