@@ -1,13 +1,11 @@
 
 var express = require('express');
-var fs = require('fs');
-
 var app = express();
 
 var content, content2;
 
 app.get('/', function(request, response) {
-	response.send('This page has an mjpeg embedded in it:<br/><img src=im.mjpeg><br/> Click here to <a href=im.mjpeg>view the image by itself</a>. <p><b>Update:</b> This page was created to demo a bug in Chrome 20/21 where an mpjeg stream viewed directly did not animate (<a href=http://crbug.com/135337>chrome bug 135337</a>). The issue has been fixed in versions >= 22. I\'ll leave this page up for anyone else trying to test mjpeg functionality.</p><p>Souce code for this mjpeg server can be found at <a href="https://github.com/psanford/node-mjpeg-test-server">https://github.com/psanford/node-mjpeg-test-server</a>.<p>');
+	response.send('AR.Drone Image Processing:<br/><img src=im.mjpeg width=100% heigth=100%><br/><a href=im.mjpeg>im.mjepg</a>');
 });
 
 app.get('/im.mjpeg', function(request, res) {

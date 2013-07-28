@@ -26,13 +26,15 @@ exports.drawBoundingRect = function(im, boundingRect, color) {
  * @param int index Index in array to draw
  * @param array Array of B,G,R int values of a color to draw with
  */
-exports.drawCenter = function(im, contours, index, color, getCenter) {
+exports.drawCenter = function(im, boundingRect, color, getCenter, width, height) {
 	var center = getCenter(
-		contours.boundingRect(index).x,
-		contours.boundingRect(index).y,
-		contours.boundingRect(index).width,
-		contours.boundingRect(index).height
+		boundingRect.x,
+		boundingRect.y,
+		boundingRect.width,
+		boundingRect.height
 	);
 
-	im.ellipse(center[0], center[1], 3, 3, color);
+	//im.ellipse(center[0], center[1], 3, 3, color);
+	im.line([center[0], 0], [center[0], heigth], color);
+	im.line([0, center[1]], [width, center[1]], color);
 }

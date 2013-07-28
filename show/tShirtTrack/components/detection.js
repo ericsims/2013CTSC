@@ -129,7 +129,7 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 		big.drawAllContours(contours, settings.WHITE);
 		big.drawContour(contours, largest_blob, settings.BLUE);
 		draw.drawBoundingRect(big, current, settings.RED);
-		draw.drawCenter(big, contours, largest_blob, settings.RED, getCenter);
+		draw.drawCenter(big, current, settings.RED, getCenter, settings.opencv.width, setting.opencv.heigth);
 	}
 
 	server.update(big.toBuffer());

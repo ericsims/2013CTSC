@@ -22,7 +22,9 @@ client
 	pngStream.on('data', function(data){
 		var XYZ = detection.readImage(data, settings);
 		if(XYZ){
-			//console.log(XYZ);
+			if(settings.debug){
+				console.log(XYZ);
+			}
 			centerTarget(XYZ);
 		} else {
 			console.log('stop');
@@ -30,7 +32,7 @@ client
 		}
 	});
 })
-.after(100000000, function() {
+.after(60000, function() {
 	this.stop();
 	this.land();
 })
