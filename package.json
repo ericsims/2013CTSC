@@ -8,12 +8,13 @@
 		"url": "https://github.com/ericsims/2013CTSC.git"
 	},
 	"dependencies" : {
-		"opencv"  : "0.3.0",
+		"opencv"  : ">=0.3.0",
 		"js-yaml" : "2.1.x",
-		"https://github.com/felixge/node-ar-drone.git" : "0.1.0",
 		"png.js" : "0.1.1",
-		"express" : ""
-		
+		"express" : ">=1.2.0",
+		"buffers" : ">=0.1.1",
+		"ar-drone": "git+https://felixge@github.com/felixge/node-ar-drone.git"
+
 	},
 	"license": "MPL",
 	"engines": {
