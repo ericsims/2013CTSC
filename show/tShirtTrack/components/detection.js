@@ -33,8 +33,9 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 			whiteBalance += average;
 		}
 	}
-	whiteBalance = whiteBalance / totalPixels;
+	whiteBalance = (whiteBalance / totalPixels + settings.target1.whiteBalance) / 2;
 	var whiteBalanceAdjust = whiteBalance / settings.target1.whiteBalance;
+	
 	if(settings.debug){
 		console.log('whiteBalance: ' + whiteBalance);
 		console.log('settings.target1.color: ' + settings.target1.color);
@@ -85,7 +86,7 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 		console.log('settings.opencv.minArea: ' + settings.opencv.minArea);
 	}
 	var largest_blob = -1;
-	if (contours.size() > 0 ){
+	if (contours.size() > 0) {
 		for(i = 0; i < contours.size(); i++) {
 			var area = contours.area(i);
 			if(area > settings.opencv.minArea){
@@ -125,11 +126,14 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 		}
 	}
 
-	if (largest_blob != -1){
+	if(contours.size() > 0){
 		big.drawAllContours(contours, settings.WHITE);
+	}
+
+	if (largest_blob != -1){
 		big.drawContour(contours, largest_blob, settings.BLUE);
 		draw.drawBoundingRect(big, current, settings.RED);
-		draw.drawCenter(big, current, settings.RED, getCenter, settings.opencv.width, setting.opencv.heigth);
+		draw.drawCenter(big, current, settings.RED, getCenter);
 	}
 
 	server.update(big.toBuffer());

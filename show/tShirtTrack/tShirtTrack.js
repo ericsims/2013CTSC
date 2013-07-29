@@ -2,6 +2,7 @@ require('js-yaml');
 var detection = require('./components/detection');
 var ardrone = require('ar-drone');
 var settings = require('./config/settings.yaml');
+var server = require('./components/mjpeg-stream');
 
 if(settings.debug){
 	console.log('settings.ardrone.ip1: ' + settings.ardrone.ip1);
@@ -10,13 +11,20 @@ if(settings.debug){
 var client = ardrone.createClient({ip: settings.ardrone.ip1});
 var pngStream = client.getPngStream();
 
-client.config('control:altitude_max', 500);
+client.config('control:altitude_max', 1000);
 
 
 client
-.after(1000, function() {
-	//this.takeoff();
+.after(5000, function() {
+	pngStream.on('data', function(data){
+		if(data){
+			server.update(data);
+		}
+	});
 })
+//.after(15000, function() {
+//this.takeoff();
+//})
 .after(5000, function() {
 
 	pngStream.on('data', function(data){
@@ -46,24 +54,24 @@ function centerTarget(cordinates){
 
 	LR = cordinates[0] - x_center;
 	FB = cordinates[2];
-	if(LR < -25) {
-		process.stdout.write('left\t\t');
-		client.counterClockwise(settings.speed);
-	} else if(LR > 25) {
-		process.stdout.write('right\t\t');
-		client.clockwise(settings.speed);
+	if(FB > 2) {
+		process.stdout.write('front\t\t');
+		client.front(settings.ardrone.moveSpeed);
+	} else if(FB < 1.5) {
+		process.stdout.write('back\t\t');
+		client.back(settings.ardrone.moveSpeed);
 	} else {
-		process.stdout.write('LR center\t\t');
+		process.stdout.write('FB center\t\t');
 		client.stop();
 	}
-	if(FB > 3.5) {
-		console.log('front');
-		client.front(settings.speed);
-	} else if(FB < 2.5) {
-		console.log('back');
-		client.back(settings.speed * 1.5);
+	if(LR < -25) {
+		console.log('left');
+		client.counterClockwise(settings.ardrone.turnSpeed);
+	} else if(LR > 25) {
+		console.log('right');
+		client.clockwise(settings.ardrone.turnSpeed);
 	} else {
-		console.log('FB center');
+		console.log('LR center');
 		client.stop();
 	}
 }

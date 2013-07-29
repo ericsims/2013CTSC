@@ -5,20 +5,21 @@ debug: 0 # True/False
 ardrone:
   ip1: 192.168.1.10
   ip2: 192.168.1.11
-  speed: 0.1 # 0 to 1
+  turnSpeed: 0.1 # 0 to 1
+  moveSpeed: 0.1 # 0 to 1
 
 # target1 color and whitebalance from static photo
 target1:
-  color: [103,128,134] #[117,164,147]
-  whiteBalance: 80.6 #76
+  color: [102,163,170] #[103,128,134]
+  whiteBalance: 69 #80.6
   
 # OpenCV settings
 opencv:
-  threshold: 10 # +/- for target color
+  threshold: 35 # +/- for target color
   lowThresh: 0
-  highThresh: 100
-  nIters: 2
-  minArea: 10
+  highThresh: 1
+  nIters: 4
+  minArea: 2000
   width: 640
   height: 360
   saveFiles: 0 # True/False

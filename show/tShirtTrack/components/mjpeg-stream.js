@@ -2,10 +2,12 @@
 var express = require('express');
 var app = express();
 
-var content, content2;
+var content;
+var stop = false;
 
 app.get('/', function(request, response) {
 	response.send('AR.Drone Image Processing:<br/><img src=im.mjpeg width=100% heigth=100%><br/><a href=im.mjpeg>im.mjepg</a>');
+	stop = false;
 });
 
 app.get('/im.mjpeg', function(request, res) {
@@ -17,7 +19,6 @@ app.get('/im.mjpeg', function(request, res) {
 	});
 
 	var i = 0;
-	var stop = false;
 
 	res.connection.on('close', function() { stop = true; });
 
