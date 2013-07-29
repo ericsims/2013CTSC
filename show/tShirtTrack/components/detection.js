@@ -8,12 +8,12 @@ var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
 var XYZ;
-exports.readImage = function readImage(data, settings){
+exports.readImage = function readImage(data, settings, target){
 	var reader = new PNG(data);
 	reader.parse(function(err, png){
 		if (err) throw err;
 		var whiteBalance = 0;	
-		calculateWhiteBalance(png, whiteBalance, settings);
+		calculateWhiteBalance(png, whiteBalance, settings, target);
 		cv.readImage(data, function(err, im){
 			XYZ = exports.cvProcess(err, im, settings);
 		});
@@ -21,7 +21,7 @@ exports.readImage = function readImage(data, settings){
 	return XYZ;
 };
 
-function calculateWhiteBalance(png, whiteBalance, settings){
+function calculateWhiteBalance(png, whiteBalance, settings, target){
 	if(settings.debug){
 		console.log('png.width: ' + png. width);
 		console.log('png.height: ' + png. height);
@@ -33,21 +33,21 @@ function calculateWhiteBalance(png, whiteBalance, settings){
 			whiteBalance += average;
 		}
 	}
-	whiteBalance = (whiteBalance / totalPixels + settings.target1.whiteBalance) / 2;
-	var whiteBalanceAdjust = whiteBalance / settings.target1.whiteBalance;
+	whiteBalance = (whiteBalance / totalPixels + target.whiteBalance) / 2;
+	var whiteBalanceAdjust = whiteBalance / target.whiteBalance;
 	
 	if(settings.debug){
 		console.log('whiteBalance: ' + whiteBalance);
-		console.log('settings.target1.color: ' + settings.target1.color);
+		console.log('target.color: ' + target.color);
 		console.log('settings.opencv.threshold: ' + settings.opencv.threshold);
 		console.log('whiteBalanceAdjust: ' + whiteBalanceAdjust);
 	}
-	lower_threshold = [(settings.target1.color[0] * whiteBalanceAdjust) - settings.opencv.threshold,
-	                   (settings.target1.color[1] * whiteBalanceAdjust) - settings.opencv.threshold,
-	                   (settings.target1.color[2] * whiteBalanceAdjust) - settings.opencv.threshold];
-	upper_threshold = [(settings.target1.color[0] * whiteBalanceAdjust) + settings.opencv.threshold,
-	                   (settings.target1.color[1] * whiteBalanceAdjust) + settings.opencv.threshold,
-	                   (settings.target1.color[2] * whiteBalanceAdjust) + settings.opencv.threshold];
+	lower_threshold = [(target.color[0] * whiteBalanceAdjust) - settings.opencv.threshold,
+	                   (target.color[1] * whiteBalanceAdjust) - settings.opencv.threshold,
+	                   (target.color[2] * whiteBalanceAdjust) - settings.opencv.threshold];
+	upper_threshold = [(target.color[0] * whiteBalanceAdjust) + settings.opencv.threshold,
+	                   (target.color[1] * whiteBalanceAdjust) + settings.opencv.threshold,
+	                   (target.color[2] * whiteBalanceAdjust) + settings.opencv.threshold];
 
 	if(settings.debug){
 		console.log(lower_threshold);

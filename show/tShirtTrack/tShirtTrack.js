@@ -16,11 +16,9 @@ client.config('control:altitude_max', 1000);
 
 client
 .after(5000, function() {
-	pngStream.on('data', function(data){
-		if(data){
-			server.update(data);
-		}
-	});
+	//pngStream.on('data', function(data){
+	//		server.update(data);
+	//});
 })
 //.after(15000, function() {
 //this.takeoff();
@@ -28,7 +26,7 @@ client
 .after(5000, function() {
 
 	pngStream.on('data', function(data){
-		var XYZ = detection.readImage(data, settings);
+		var XYZ = detection.readImage(data, settings, settings.target1);
 		if(XYZ){
 			if(settings.debug){
 				console.log(XYZ);

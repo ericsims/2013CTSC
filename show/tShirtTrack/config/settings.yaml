@@ -12,6 +12,11 @@ ardrone:
 target1:
   color: [102,163,170] #[103,128,134]
   whiteBalance: 69 #80.6
+
+# target2 color and whitebalance from static photo
+target2:
+  color: [102,163,170] #[103,128,134]
+  whiteBalance: 69 #80.6
   
 # OpenCV settings
 opencv:
