@@ -3,16 +3,27 @@ var detection = require('./components/detection');
 var ardrone = require('ar-drone');
 var settings = require('./config/settings.yaml');
 var server = require('./components/mjpeg-stream');
+var target = -1;
 
 if(settings.debug){
 	console.log('settings.ardrone.ip1: ' + settings.ardrone.ip1);
+}
+
+process.argv.forEach(function (val, index, array) {
+	if( index == 2 ){
+		target = val;
+	}
+});
+
+if(target < 0){
+	console.log('Please pass a target number!');
+	process.exit();
 }
 
 var client = ardrone.createClient({ip: settings.ardrone.ip1});
 var pngStream = client.getPngStream();
 
 client.config('control:altitude_max', 1000);
-
 
 client
 .after(5000, function() {
@@ -26,7 +37,7 @@ client
 .after(5000, function() {
 
 	pngStream.on('data', function(data){
-		var XYZ = detection.readImage(data, settings, settings.target1);
+		var XYZ = detection.readImage(data, settings, settings['target'+target]);
 		if(XYZ){
 			if(settings.debug){
 				console.log(XYZ);
