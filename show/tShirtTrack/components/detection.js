@@ -8,14 +8,15 @@ var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
 var XYZ;
-exports.readImage = function readImage(data, settings, target){
+exports.readImage = function readImage(data, settings, index){
+	target = settings['target'+index];
 	var reader = new PNG(data);
 	reader.parse(function(err, png){
 		if (err) throw err;
 		var whiteBalance = 0;	
 		calculateWhiteBalance(png, whiteBalance, settings, target);
 		cv.readImage(data, function(err, im){
-			XYZ = exports.cvProcess(err, im, settings);
+			XYZ = exports.cvProcess(err, im, settings, target);
 		});
 	});
 	return XYZ;
@@ -55,7 +56,7 @@ function calculateWhiteBalance(png, whiteBalance, settings, target){
 	}
 };
 
-exports.cvProcess = function cvProcess(err, im_orig, settings) {
+exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 	var big = im_orig.copy();
 	var im = im_orig.copy();
 	if(settings.opencv.saveFiles){
@@ -115,7 +116,7 @@ exports.cvProcess = function cvProcess(err, im_orig, settings) {
 			if(settings.debug){
 				console.log('center: ' + center);
 			}
-			var distance = 215.4 / ( Math.sqrt(contours.area(largest_blob)) );//Math.sqrt(contours.area(largest_blob)) or current.width
+			var distance = target.dissize / ( Math.sqrt(contours.area(largest_blob)) );
 		}
 	}
 	if(settings.debug){

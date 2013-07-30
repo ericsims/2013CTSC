@@ -31,13 +31,13 @@ client
 	//		server.update(data);
 	//});
 })
-//.after(15000, function() {
-//this.takeoff();
-//})
+.after(15000, function() {
+	this.takeoff();
+})
 .after(5000, function() {
 
 	pngStream.on('data', function(data){
-		var XYZ = detection.readImage(data, settings, settings['target'+target]);
+		var XYZ = detection.readImage(data, settings, target);
 		if(XYZ){
 			if(settings.debug){
 				console.log(XYZ);
