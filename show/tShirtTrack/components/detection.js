@@ -40,15 +40,15 @@ function calculateWhiteBalance(png, whiteBalance, settings, target){
 	if(settings.debug){
 		console.log('whiteBalance: ' + whiteBalance);
 		console.log('target.color: ' + target.color);
-		console.log('settings.opencv.threshold: ' + settings.opencv.threshold);
+		console.log('settings.targetx.threshold: ' + target.threshold);
 		console.log('whiteBalanceAdjust: ' + whiteBalanceAdjust);
 	}
-	lower_threshold = [(target.color[0] * whiteBalanceAdjust) - settings.opencv.threshold,
-	                   (target.color[1] * whiteBalanceAdjust) - settings.opencv.threshold,
-	                   (target.color[2] * whiteBalanceAdjust) - settings.opencv.threshold];
-	upper_threshold = [(target.color[0] * whiteBalanceAdjust) + settings.opencv.threshold,
-	                   (target.color[1] * whiteBalanceAdjust) + settings.opencv.threshold,
-	                   (target.color[2] * whiteBalanceAdjust) + settings.opencv.threshold];
+	lower_threshold = [(target.color[0] * whiteBalanceAdjust) - target.threshold,
+	                   (target.color[1] * whiteBalanceAdjust) - target.threshold,
+	                   (target.color[2] * whiteBalanceAdjust) - target.threshold];
+	upper_threshold = [(target.color[0] * whiteBalanceAdjust) + target.threshold,
+	                   (target.color[1] * whiteBalanceAdjust) + target.threshold,
+	                   (target.color[2] * whiteBalanceAdjust) + target.threshold];
 
 	if(settings.debug){
 		console.log(lower_threshold);

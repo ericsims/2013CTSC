@@ -20,7 +20,9 @@ app.get('/im.mjpeg', function(request, res) {
 
 	var i = 0;
 
-	res.connection.on('close', function() { stop = true; });
+	res.connection.on('close', function() {
+		stop = true;
+	});
 
 	var send_next = function() {
 		if (stop || !content)
@@ -31,16 +33,19 @@ app.get('/im.mjpeg', function(request, res) {
 		res.write("\r\n");
 		res.write(content, 'binary');
 		res.write("\r\n");
-		setTimeout(send_next, 250);
+		setTimeout(send_next, 500);
 	};
 	send_next();
 });
 
 exports.update = function update(img){
+	if(!content)
+		console.log("Image server running")
 	content = img;
 };
 
-var port = process.env.PORT || 5000;
+var port = 5000;
+
 app.listen(port, function() {
 	console.log("Listening on " + port);
 });

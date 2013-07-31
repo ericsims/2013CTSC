@@ -3,7 +3,11 @@ var detection = require('./components/detection');
 var ardrone = require('ar-drone');
 var settings = require('./config/settings.yaml');
 var server = require('./components/mjpeg-stream');
+var sys = require("sys");
+
+var stdin = process.openStdin();
 var target = -1;
+var tracking = false;
 
 if(settings.debug){
 	console.log('settings.ardrone.ip1: ' + settings.ardrone.ip1);
@@ -25,19 +29,9 @@ var pngStream = client.getPngStream();
 
 client.config('control:altitude_max', 1000);
 
-client
-.after(5000, function() {
-	//pngStream.on('data', function(data){
-	//		server.update(data);
-	//});
-})
-.after(15000, function() {
-	this.takeoff();
-})
-.after(5000, function() {
-
-	pngStream.on('data', function(data){
-		var XYZ = detection.readImage(data, settings, target);
+pngStream.on('data', function(data){
+	var XYZ = detection.readImage(data, settings, target);
+	if (tracking){
 		if(XYZ){
 			if(settings.debug){
 				console.log(XYZ);
@@ -47,15 +41,30 @@ client
 			console.log('stop');
 			client.stop();
 		}
-	});
-})
-.after(60000, function() {
-	this.stop();
-	this.land();
-})
-.after(1000, function() {
-	process.exit(1);
+	}
 });
+
+stdin.addListener("data", function(data) {
+	data = data.toString().substring(0, data.length-1);
+	console.log("you entered: [" + data + "]");
+	if(data == 'takeoff'){
+		takeoff();
+	} else if (data == 'start track') {
+		tracking = true;
+	} else if (data == 'stop track') {
+		tracking = false;
+	} else if (data == 'exit') {
+		process.exit();
+	}
+});
+
+function takeoff(){
+	client.takeoff();
+}
+function exit(){
+	client.stop();
+	client.land()
+}
 
 function centerTarget(cordinates){
 	x_center = settings.opencv.width / 2;
