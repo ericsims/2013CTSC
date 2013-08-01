@@ -2,12 +2,11 @@ var cv = require('opencv');
 var PNG = require('png.js');
 var draw = require('./draw');
 var http = require('http');
-var server = require('./mjpeg-stream');
 
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-var XYZ;
+var XYZIMG;
 exports.readImage = function readImage(data, settings, index){
 	target = settings['target'+index];
 	var reader = new PNG(data);
@@ -16,10 +15,10 @@ exports.readImage = function readImage(data, settings, index){
 		var whiteBalance = 0;	
 		calculateWhiteBalance(png, whiteBalance, settings, target);
 		cv.readImage(data, function(err, im){
-			XYZ = exports.cvProcess(err, im, settings, target);
+			XYZIMG = exports.cvProcess(err, im, settings, target);
 		});
 	});
-	return XYZ;
+	return XYZIMG;
 };
 
 function calculateWhiteBalance(png, whiteBalance, settings, target){
@@ -73,7 +72,7 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 		}
 	}
 	im.canny(settings.opencv.lowThresh, settings.opencv.highThresh);
-	im.dilate(settings.opencv.nIters);
+	im.dilate(target.nIters);
 	if(settings.opencv.saveFiles){
 		im.save('./canny.png');
 		if(settings.debug){
@@ -84,13 +83,13 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 	var contours = im.findContours();
 	if(settings.debug){
 		console.log('found contours: ' + contours.size());
-		console.log('settings.opencv.minArea: ' + settings.opencv.minArea);
+		console.log('settings.targetx.minArea: ' + target.minArea);
 	}
 	var largest_blob = -1;
 	if (contours.size() > 0) {
 		for(i = 0; i < contours.size(); i++) {
 			var area = contours.area(i);
-			if(area > settings.opencv.minArea){
+			if(area > target.minArea){
 				if(largest_blob != -1) {
 					if(area > contours.area(largest_blob)) {
 						largest_blob=i;
@@ -137,8 +136,6 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 		draw.drawCenter(big, current, settings.RED, getCenter);
 	}
 
-	server.update(big.toBuffer());
-
 	if(settings.opencv.saveFiles){
 		big.save('./big.png');
 		if(settings.debug){
@@ -146,9 +143,9 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 		}
 	}
 	if(largest_blob != -1) {
-		return [center[0], center[1], distance];
+		return [center[0], center[1], distance, big.toBuffer()];
 	} else {
-		return;
+		return [-1, -1, -1, big.toBuffer()];
 	}
 };
 

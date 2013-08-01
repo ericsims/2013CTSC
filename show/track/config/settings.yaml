@@ -6,13 +6,23 @@ ardrone:
   ip1: 192.168.1.10
   ip2: 192.168.1.11
   turnSpeed: 0.25 # 0 to 1
-  moveSpeed: 0.1 # 0 to 1
+  FBSpeed: 0.1 # 0 to 1
+  LRSpeed: 0.1 # 0 to 1
+  UDSpeed: 0.1 # 0 to 1
+  color: [235,20,20]
+  whiteBalance: 71
+  threshold: 50 # +/- for target color
+  nIters: 10
+  minArea: 1500
+  dissize: 150
 
 # target0 color and whitebalance from static photo (lightsaber theater)
 target0:
   color: [250,250,63]
   whiteBalance: 71
   threshold: 50 # +/- for target color
+  nIters: 10
+  minArea: 1500
   dissize: 150
 
 # target1 color and whitebalance from static photo (lightsaber upstairs)
@@ -20,18 +30,27 @@ target1:
   color: [247,255,150]
   whiteBalance: 140
   threshold: 25 # +/- for target color
+  nIters: 10
+  minArea: 1500
   dissize: 100
-
 
 # OpenCV settings
 opencv:
   lowThresh: 0
   highThresh: 1
-  nIters: 10
-  minArea: 1000
   width: 640
   height: 360
   saveFiles: 0 # True/False
+  
+# Camera
+camera:
+  ip: 192.168.1.20
+  port: 80
+  username: root
+  password: CSC
+  resolution: 640x480
+  compression: 30
+  fps: 10
   
 # B, G, R
 GREEN: [0,255,0]
