@@ -2,23 +2,41 @@ var cv = require('opencv');
 var PNG = require('png.js');
 var draw = require('./draw');
 var http = require('http');
+var server = require('./mjpeg-stream');
 
 var lower_threshold = [0, 0, 0];
 var upper_threshold = [0, 0, 0];
 
-var XYZIMG;
-exports.readImage = function readImage(data, settings, index){
-	target = settings['target'+index];
-	var reader = new PNG(data);
-	reader.parse(function(err, png){
-		if (err) throw err;
-		var whiteBalance = 0;	
-		calculateWhiteBalance(png, whiteBalance, settings, target);
-		cv.readImage(data, function(err, im){
-			XYZIMG = exports.cvProcess(err, im, settings, target);
-		});
-	});
-	return XYZIMG;
+var XYZ;
+exports.readImage = function readImage(data, settings, index, adjustWhiteBalance){
+	if(index > -1){
+		target = settings['target'+index];
+		if(adjustWhiteBalance) {
+			var reader = new PNG(data);
+			reader.parse(function(err, png){
+				if (err) throw err;
+				var whiteBalance = 0;	
+				calculateWhiteBalance(png, whiteBalance, settings, target);
+				cv.readImage(data, function(err, im){
+					XYZ = exports.cvProcess(err, im, settings, target);
+				});
+			});
+		} else {
+			lower_threshold = [target.color[0] - target.threshold,
+			                   target.color[1] - target.threshold,
+			                   target.color[2] - target.threshold];
+			upper_threshold = [target.color[0] + target.threshold,
+			                   target.color[1] + target.threshold,
+			                   target.color[2] + target.threshold];
+			cv.readImage(data, function(err, im){
+				XYZ = exports.cvProcess(err, im, settings, target);
+			});
+		}
+		return XYZ;
+	} else {
+		server.update(data);
+		return [-1, -1, -1];
+	}
 };
 
 function calculateWhiteBalance(png, whiteBalance, settings, target){
@@ -35,7 +53,7 @@ function calculateWhiteBalance(png, whiteBalance, settings, target){
 	}
 	whiteBalance = (whiteBalance / totalPixels + target.whiteBalance) / 2;
 	var whiteBalanceAdjust = whiteBalance / target.whiteBalance;
-	
+
 	if(settings.debug){
 		console.log('whiteBalance: ' + whiteBalance);
 		console.log('target.color: ' + target.color);
@@ -142,10 +160,13 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 			console.log('big.png saved');
 		}
 	}
+
+	server.update(big.toBuffer());
+
 	if(largest_blob != -1) {
-		return [center[0], center[1], distance, big.toBuffer()];
+		return [center[0], center[1], distance];
 	} else {
-		return [-1, -1, -1, big.toBuffer()];
+		return [-1, -1, -1];
 	}
 };
 
