@@ -33,7 +33,7 @@ app.get('/im.mjpeg', function(request, res) {
 		res.write("\r\n");
 		res.write(content, 'binary');
 		res.write("\r\n");
-		setTimeout(send_next, 500);
+		setTimeout(send_next, 100);
 	};
 	send_next();
 });

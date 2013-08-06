@@ -5,9 +5,9 @@ var vapix = require('vapix');
 var sys = require("sys");
 var exec = require('child_process').exec;
 
-var settings = require('./config/settings.yaml');
-var detection = require('./components/detection');
-var actions = require('./components/actions');
+var settings = require('./track/config/settings.yaml');
+var detection = require('./track/components/detection');
+var actions = require('./track/components/actions');
 
 var stdin = process.openStdin();
 var target = -1;
@@ -38,7 +38,7 @@ var camera = new vapix.Camera({
 	password: settings.camera.password
 });
 var mjpg;
-exec("ping -c 3 " + settings.camera.ip, function (error, stdout, stderr) {
+/*exec("ping -c 3 " + settings.camera.ip, function (error, stdout, stderr) {
 	if(stdout.indexOf("0% packet loss") != -1){
 		console.log('network camera found');
 		mjpg = camera.createVideoStream({
@@ -49,7 +49,7 @@ exec("ping -c 3 " + settings.camera.ip, function (error, stdout, stderr) {
 	} else {
 		console.log('network camera NOT found!!!');
 	}
-});
+});*/
 
 pngStream.on('data', function(data){
 	if(streamSource == 'ardrone'){
@@ -68,22 +68,23 @@ pngStream.on('data', function(data){
 	}
 });
 
-if(mjpg){mjpg.on('data', function(data) {
-	if(streamSource == 'vapix'){
-		var XYZ = detection.readImage(data, settings, target, false);
-		if(XYZ && follow){
-			if(XYZ[0] != -1 && XYZ[1] != -1 && XYZ[2] != -1){
-				if(settings.debug){
-					console.log(XYZ);
+if(mjpg){
+	mjpg.on('data', function(data) {
+		if(streamSource == 'vapix'){
+			var XYZ = detection.readImage(data, settings, target, false);
+			if(XYZ && follow){
+				if(XYZ[0] != -1 && XYZ[1] != -1 && XYZ[2] != -1){
+					if(settings.debug){
+						console.log(XYZ);
+					}
+					actions.centerTarget(XYZ, settings, client);
+				} else {
+					console.log('stop');
+					client.stop();
 				}
-				actions.centerTarget(XYZ, settings, client);
-			} else {
-				console.log('stop');
-				client.stop();
 			}
 		}
-	}
-});
+	});
 }
 
 stdin.addListener("data", function(data) {
@@ -93,6 +94,10 @@ stdin.addListener("data", function(data) {
 		takeoff();
 	} else if(data == 'land'){
 		land();
+	} else if(data == 'calibrate'){
+		actions.calibrate(client);
+	} else if(data == 'hover'){
+		actions.hover(client);
 	} else if (data.indexOf('set streamSource') != -1) {
 		streamSource = data.substring(17);
 		console.log('steamSource is now: ' + streamSource);

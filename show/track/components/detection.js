@@ -34,7 +34,9 @@ exports.readImage = function readImage(data, settings, index, adjustWhiteBalance
 		}
 		return XYZ;
 	} else {
-		server.update(data);
+		cv.readImage(data, function(err, im){
+			XYZ = exports.cvProcess(err, im, settings, target);
+		});
 		return [-1, -1, -1];
 	}
 };
@@ -44,14 +46,15 @@ function calculateWhiteBalance(png, whiteBalance, settings, target){
 		console.log('png.width: ' + png. width);
 		console.log('png.height: ' + png. height);
 	}
-	var totalPixels = png.width * png.height;
-	for (var x = 0; x < png.width; x++){
-		for (var y = 0; y < png.height; y++){
+	var usageFrequency = 10;
+	var totalPixels = (png.width * png.height) / (usageFrequency * usageFrequency);
+	for (var x = 0; x <= png.width - usageFrequency; x += usageFrequency){
+		for (var y = 0; y <= png.height - usageFrequency; y += usageFrequency){
 			var average = (png.getPixel(x,y)[0] + png.getPixel(x,y)[1] + png.getPixel(x,y)[2]) / 3;
 			whiteBalance += average;
 		}
 	}
-	whiteBalance = (whiteBalance / totalPixels + target.whiteBalance) / 2;
+	whiteBalance = whiteBalance / totalPixels;
 	var whiteBalanceAdjust = whiteBalance / target.whiteBalance;
 
 	if(settings.debug){
@@ -82,7 +85,8 @@ exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 			console.log('matrix.png saved');
 		}
 	}
-	im.inRange(lower_threshold, upper_threshold);
+	if(target)
+		im.inRange(lower_threshold, upper_threshold);
 	if(settings.opencv.saveFiles){
 		im.save('./color.png');
 		if(settings.debug){

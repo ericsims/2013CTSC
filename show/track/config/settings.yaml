@@ -17,29 +17,29 @@ ardrone:
 
 # target0 color and whitebalance from static photo (lightsaber theater)
 target0:
-  color: [160,115,30]
-  whiteBalance: 90
-  threshold: 25 # +/- for target color
+  color: [252,226,134]
+  whiteBalance: 45
+  threshold: 50 # +/- for target color
   nIters: 10
   minArea: 500
-  dissize: 20
+  dissize: 150
 
 # target1 color and whitebalance from static photo (lightsaber upstairs)
 target1:
-  color: [247,255,150]
-  whiteBalance: 140
+  color: [255,253,69]
+  whiteBalance: 115
   threshold: 25 # +/- for target color
   nIters: 10
   minArea: 500
-  dissize: 100
+  dissize: 150
   
-# target2 color and whitebalance from static photo (lightsaber upstairs)
-target2:
-  color: [198,242,187]
-  whiteBalance: 142
-  threshold: 20 # +/- for target color
-  nIters: 10
-  minArea: 500
+# target3 color and whitebalance from static photo (laser upstairs)
+target3:
+  color: [198,246,159]
+  whiteBalance: 137
+  threshold: 30 # +/- for target color
+  nIters: 1
+  minArea: 10
   dissize: 100
 
 # OpenCV settings
