@@ -6,7 +6,11 @@ var content;
 var stop = false;
 
 app.get('/', function(request, response) {
-	response.send('AR.Drone Image Processing:<br/><img src=im.mjpeg width=100% heigth=100%><br/><a href=im.mjpeg>im.mjepg</a>');
+	response.send('AR.Drone Image Processing:\
+			<br/>\
+			<img src=im.mjpeg width=100% heigth=100%>\
+			<br/>\
+			<a href=im.mjpeg>im.mjepg</a>');
 	stop = false;
 });
 

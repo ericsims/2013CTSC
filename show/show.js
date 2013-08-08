@@ -1,5 +1,7 @@
 require('js-yaml');
 
+var fs = require('fs');
+
 var ardrone = require('ar-drone');
 var vapix = require('vapix');
 var sys = require("sys");

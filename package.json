@@ -14,6 +14,7 @@
 		"express" : ">=1.2.0",
 		"buffers" : ">=0.1.1",
 		"vapix" : ">=0.0.0",
+		"socket.io" : "0.9.x",
 		"ar-drone": "git+https://felixge@github.com/felixge/node-ar-drone.git"
 
 	},

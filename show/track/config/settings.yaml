@@ -21,7 +21,7 @@ target0:
   whiteBalance: 45
   threshold: 50 # +/- for target color
   nIters: 10
-  minArea: 500
+  minArea: 100
   dissize: 150
 
 # target1 color and whitebalance from static photo (lightsaber upstairs)

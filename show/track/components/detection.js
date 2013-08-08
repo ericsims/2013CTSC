@@ -9,8 +9,8 @@ var upper_threshold = [0, 0, 0];
 
 var XYZ;
 exports.readImage = function readImage(data, settings, index, adjustWhiteBalance){
-	if(index > -1){
-		target = settings['target'+index];
+	var	target = settings['target'+index];
+	if(target){
 		if(adjustWhiteBalance) {
 			var reader = new PNG(data);
 			reader.parse(function(err, png){
@@ -79,97 +79,100 @@ function calculateWhiteBalance(png, whiteBalance, settings, target){
 exports.cvProcess = function cvProcess(err, im_orig, settings, target) {
 	var big = im_orig.copy();
 	var im = im_orig.copy();
-	if(settings.opencv.saveFiles){
-		im.save('./matrix.png');
-		if(settings.debug){
-			console.log('matrix.png saved');
+	if(target){
+		if(settings.opencv.saveFiles){
+			im.save('./matrix.png');
+			if(settings.debug){
+				console.log('matrix.png saved');
+			}
 		}
-	}
-	if(target)
-		im.inRange(lower_threshold, upper_threshold);
-	if(settings.opencv.saveFiles){
-		im.save('./color.png');
-		if(settings.debug){
-			console.log('color.png saved');
+		if(target)
+			im.inRange(lower_threshold, upper_threshold);
+		if(settings.opencv.saveFiles){
+			im.save('./color.png');
+			if(settings.debug){
+				console.log('color.png saved');
+			}
 		}
-	}
-	im.canny(settings.opencv.lowThresh, settings.opencv.highThresh);
-	im.dilate(target.nIters);
-	if(settings.opencv.saveFiles){
-		im.save('./canny.png');
-		if(settings.debug){
-			console.log('canny.png saved');
+		im.canny(settings.opencv.lowThresh, settings.opencv.highThresh);
+		im.dilate(target.nIters);
+		if(settings.opencv.saveFiles){
+			im.save('./canny.png');
+			if(settings.debug){
+				console.log('canny.png saved');
+			}
 		}
-	}
 
-	var contours = im.findContours();
-	if(settings.debug){
-		console.log('found contours: ' + contours.size());
-		console.log('settings.targetx.minArea: ' + target.minArea);
-	}
-	var largest_blob = -1;
-	if (contours.size() > 0) {
-		for(i = 0; i < contours.size(); i++) {
-			var area = contours.area(i);
-			if(area > target.minArea){
-				if(largest_blob != -1) {
-					if(area > contours.area(largest_blob)) {
-						largest_blob=i;
+		var contours = im.findContours();
+		if(settings.debug){
+			console.log('found contours: ' + contours.size());
+			console.log('settings.targetx.minArea: ' + target.minArea);
+		}
+		var largest_blob = -1;
+		if (contours.size() > 0) {
+			for(i = 0; i < contours.size(); i++) {
+				var area = contours.area(i);
+				if(area > target.minArea){
+					if(largest_blob != -1) {
+						if(area > contours.area(largest_blob)) {
+							largest_blob=i;
+						}
+					} else {
+						largest_blob = i;
 					}
-				} else {
-					largest_blob = i;
 				}
 			}
-		}
-		if(settings.debug){
-			console.log('largest_blob: ' + largest_blob);
-		}
-
-		if(largest_blob != -1) {
-			var current = contours.boundingRect(largest_blob);
-			if(current.x == 1 || current.x == settings.opencv.width
-					|| current.y == 1 || current.y == settings.opencv.height){
-				largest_blob = -1;
-			}
-		}
-		if(largest_blob != -1) {
-			var center = getCenter(current.x, current.y, current.width, current.height, settings);
 			if(settings.debug){
-				console.log('center: ' + center);
+				console.log('largest_blob: ' + largest_blob);
 			}
-			var distance = target.dissize / ( Math.sqrt(contours.area(largest_blob)) );
+
+			if(largest_blob != -1) {
+				var current = contours.boundingRect(largest_blob);
+				if(current.x == 1 || current.x == settings.opencv.width
+						|| current.y == 1 || current.y == settings.opencv.height){
+					largest_blob = -1;
+				}
+			}
+			if(largest_blob != -1) {
+				var center = getCenter(current.x, current.y, current.width, current.height, settings);
+				if(settings.debug){
+					console.log('center: ' + center);
+				}
+				var distance = target.dissize / ( Math.sqrt(contours.area(largest_blob)) );
+			}
 		}
-	}
-	if(settings.debug){
-		if(largest_blob != -1) {
-			console.log(center[0] + ', ' + center[1]);
-		} else {
-			console.log('no target found');
-		}
-	}
-
-	if(contours.size() > 0){
-		big.drawAllContours(contours, settings.WHITE);
-	}
-
-	if (largest_blob != -1){
-		big.drawContour(contours, largest_blob, settings.BLUE);
-		draw.drawBoundingRect(big, current, settings.RED);
-		draw.drawCenter(big, current, settings.RED, getCenter);
-	}
-
-	if(settings.opencv.saveFiles){
-		big.save('./big.png');
 		if(settings.debug){
-			console.log('big.png saved');
+			if(largest_blob != -1) {
+				console.log(center[0] + ', ' + center[1]);
+			} else {
+				console.log('no target found');
+			}
 		}
-	}
+		if(contours.size() > 0){
+			big.drawAllContours(contours, settings.WHITE);
+		}
 
-	server.update(big.toBuffer());
+		if (largest_blob != -1){
+			big.drawContour(contours, largest_blob, settings.BLUE);
+			draw.drawBoundingRect(big, current, settings.RED);
+			draw.drawCenter(big, current, settings.RED, getCenter);
+		}
 
-	if(largest_blob != -1) {
-		return [center[0], center[1], distance];
+		if(settings.opencv.saveFiles){
+			big.save('./big.png');
+			if(settings.debug){
+				console.log('big.png saved');
+			}
+		}
+		server.update(big.toBuffer());
+
+		if(largest_blob != -1) {
+			return [center[0], center[1], distance];
+		} else {
+			return [-1, -1, -1];
+		}
 	} else {
+		server.update(big.toBuffer());
 		return [-1, -1, -1];
 	}
 };
