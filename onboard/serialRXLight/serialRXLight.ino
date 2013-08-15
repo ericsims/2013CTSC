@@ -5,7 +5,8 @@ void setup() {
 }
 void loop() {
   while (Serial.available() > 0) {
-    int value = Serial.parseInt(); 
+    int value = Serial.parseInt();
+     Serial.write(value+'\n'); 
     if (Serial.read() == '\n') {
       digitalWrite(13, value);
     }
