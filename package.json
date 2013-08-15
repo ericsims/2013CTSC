@@ -8,7 +8,11 @@
 		"url": "https://github.com/ericsims/2013CTSC.git"
 	},
 	"dependencies" : {
+<<<<<<< HEAD
 		"opencv"  : "git+https://notcoffeetable@github.com/notcoffeetable/node-opencv.git",
+=======
+		"opencv"  : "0.3.x",
+>>>>>>> 8f6aac720791f5443263926b41433c39587cdf26
 		"js-yaml" : "2.1.x",
 		"png.js" : "0.1.1",
 		"express" : ">=1.2.0",
