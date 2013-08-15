@@ -8,11 +8,14 @@
 		"url": "https://github.com/ericsims/2013CTSC.git"
 	},
 	"dependencies" : {
-		"opencv"  : ">=0.3.0",
+		"opencv"  : "node-opencv",
+		"opencv"  : "0.3.x",
 		"js-yaml" : "2.1.x",
 		"png.js" : "0.1.1",
 		"express" : ">=1.2.0",
 		"buffers" : ">=0.1.1",
+		"vapix" : ">=0.0.0",
+		"socket.io" : "0.9.x",
 		"ar-drone": "git+https://felixge@github.com/felixge/node-ar-drone.git"
 
 	},
