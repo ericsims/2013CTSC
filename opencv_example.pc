@@ -1,8 +1,8 @@
 # Package Information for pkg-config
 
-prefix=C:/src/opencv
+prefix="C:/Program Files/nodejs/opencV"
 exec_prefix=${prefix}/bin
-libdir=${prefix}/build/x86/vc11/lib
+libdir=${prefix}/build/x64/vc11/lib
 includedir_old=${prefix}/build/include/opencv
 includedir_new=${prefix}/build/include
 
