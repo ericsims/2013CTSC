@@ -41,6 +41,15 @@ target3:
   nIters: 1
   minArea: 10
   dissize: 100
+  
+# target4 color and whitebalance from static photo (laser upstairs)
+target4:
+  color: [70,86,166]
+  whiteBalance: 45
+  threshold: 30 # +/- for target color
+  nIters: 10
+  minArea: 10
+  dissize: 200
 
 # OpenCV settings
 opencv:
