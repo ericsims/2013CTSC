@@ -104,7 +104,7 @@ stdin.addListener("data", function(data) {
 		streamSource = data.substring(17);
 		console.log('steamSource is now: ' + streamSource);
 	} else if (data.indexOf('set target') != -1) {
-		target = parseInt(data.substring(10))
+		target = parseInt(data.substring(10));
 		console.log('target is now: ' + target);
 	} else if (data == 'start track') {
 		if (target > -1){
@@ -126,6 +126,6 @@ function takeoff(){
 }
 function land(){
 	client.stop();
-	client.land()
+	client.land();
 }
 
