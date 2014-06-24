@@ -4,7 +4,6 @@ debug: 0 # True/False
 # AR.Drone settings
 ardrone:
   ip1: 192.168.1.10
-  ip2: 192.168.1.11
   turnSpeed: 0.25 # 0 to 1
   FBSpeed: 0.1 # 0 to 1
   LRSpeed: 0.1 # 0 to 1
