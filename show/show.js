@@ -33,12 +33,12 @@ if(settings.debug){
 var client = ardrone.createClient({ip: settings.ardrone.ip1});
 client.config('control:altitude_max', 1000);
 var pngStream = client.getPngStream();
-var camera = new vapix.Camera({
+/*var camera = new vapix.Camera({
 	address: settings.camera.ip,
 	port: settings.camera.port,
 	username: settings.camera.username,
 	password: settings.camera.password
-});
+});*/
 var mjpg;
 /*exec("ping -c 3 " + settings.camera.ip, function (error, stdout, stderr) {
 	if(stdout.indexOf("0% packet loss") != -1){

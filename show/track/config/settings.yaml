@@ -3,7 +3,7 @@ debug: 0 # True/False
 
 # AR.Drone settings
 ardrone:
-  ip1: 192.168.1.10
+  ip1: 192.168.1.1
   turnSpeed: 0.25 # 0 to 1
   FBSpeed: 0.1 # 0 to 1
   LRSpeed: 0.1 # 0 to 1
@@ -25,10 +25,10 @@ target0:
 
 # target1 color and whitebalance from static photo (lightsaber upstairs)
 target1:
-  color: [255,253,69]
+  color: [255,253,70]
   whiteBalance: 115
-  threshold: 25 # +/- for target color
-  nIters: 10
+  threshold: 80 # +/- for target color
+  nIters: 5
   minArea: 500
   dissize: 150
   
